@@ -1,0 +1,33 @@
+FROM node:8
+ARG proxy
+ARG app_path
+ARG app_name
+ARG app_ver
+ARG npm_registry
+ARG sass_registry
+ENV APP ${APP}
+ENV APP_VERSION ${APP_VERSION}
+
+WORKDIR /$app_path
+COPY package.json.template .
+RUN cat package.json.template | sed "s/<APP>/${app_name}/;s/<VERSION>/${app_ver}/" > package.json
+
+# cache package.json and node_modules to speed up builds
+RUN if [ ! -z "$proxy" ] ; then \
+         npm config delete proxy; \
+         npm config set proxy $proxy; \
+         npm config set https-proxy $proxy ; \
+    fi ; \
+    [ -z "$npm_registry" ] || npm config set registry=$npm_registry ; \
+    [ -z "$sass_registry" ] || npm config set sass_binary_site=$sass_registry ; \
+    npm i npm@latest -g ; \
+    npm install ; \
+    npm audit fix --force --registry=https://registry.npmjs.org
+
+COPY ${app_name}-${app_ver}-frontend.tar.gz /
+RUN  set -ex ; tar -zxvf /${app_name}-${app_ver}-frontend.tar.gz -C /${app_path}  && \
+     npm run build 2>&1 | tee npm.log; egrep -E '(ERROR|error)' npm.log && exit 1 ; rm -rf npm.log \
+     rm -rf /${app_name}-${app_ver}-frontend.tar.gz
+
+EXPOSE 8080
+CMD ["npm","run","build"]

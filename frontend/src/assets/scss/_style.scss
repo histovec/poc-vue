@@ -1727,6 +1727,11 @@ h5 + .separator {
   padding: 40px;
 }
 
+.ph-10 {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
 .ph-20 {
   padding-left: 20px;
   padding-right: 20px;
@@ -9296,6 +9301,10 @@ hr.style1 {
 .info_red {
   font-weight: 400;
   color: #900;
+}
+
+.info_green {
+  color: #31B404;
 }
 
 .no-color {

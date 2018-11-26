@@ -10,19 +10,20 @@ export PORT=80
 export APP=histovec
 export COMPOSE_PROJECT_NAME=${APP}
 export APP_PATH := $(shell pwd)
-export APP_VERSION	:= $(shell git describe --tags)
+export APP_VERSION	:= $(shell git describe --tags || cat VERSION )
 export BACKEND=${APP_PATH}/backend
 export FRONTEND=${APP_PATH}/frontend
 export LOGS=${APP_PATH}/log
 export DC_DIR=${APP_PATH}
 export DC_PREFIX=${DC_DIR}/docker-compose
-
+export USE_TTY := $(shell test -t 1 && USE_TTY="-t")
 export ES_MEM=2048m
 export ES_HOST=elasticsearch
 
 # data prep (data not included in repo)
 export datadir=sample_data
-export datasource=${datadir}/siv.csv.gz.gpg
+export datasource=${datadir}/siv.csv.gz
+export datasource_crypt=${datadir}/siv.csv.gz.gpg
 export datasource_json=${datadir}/siv.json.gz
 export dataset=siv
 export ES_CHUNK=5000
@@ -45,39 +46,39 @@ vm_max_count		:= $(shell cat /etc/sysctl.conf | egrep vm.max_map_count\s*=\s*262
 dummy               := $(shell touch artifacts)
 include ./artifacts
 
-DC := 'docker-compose'
+DC := docker-compose
 
 install-prerequisites:
 ifeq ("$(wildcard /usr/bin/docker)","")
-        echo install docker-ce, still to be tested
-        sudo apt-get update
-        sudo apt-get install \
+	echo install docker-ce, still to be tested
+	sudo apt-get update
+	sudo apt-get install \
         apt-transport-https \
         ca-certificates \
         curl \
         software-properties-common
 
-        curl -fsSL https://download.docker.com/linux/${ID}/gpg | sudo apt-key add -
-        sudo add-apt-repository \
+	curl -fsSL https://download.docker.com/linux/${ID}/gpg | sudo apt-key add -
+	sudo add-apt-repository \
                 "deb https://download.docker.com/linux/ubuntu \
                 `lsb_release -cs` \
                 stable"
-        sudo apt-get update
-        sudo apt-get install -y docker-ce
-        @(if (id -Gn ${USER} | grep -vc docker); then sudo usermod -aG docker ${USER} ;fi) > /dev/null
+	sudo apt-get update
+	sudo apt-get install -y docker-ce
+	@(if (id -Gn ${USER} | grep -vc docker); then sudo usermod -aG docker ${USER} ;fi) > /dev/null
 endif
 ifeq ("$(wildcard /usr/bin/gawk)","")
 	@echo installing gawk
 	@sudo apt-get install -y gawk
-endif	
+endif
 ifeq ("$(wildcard /usr/bin/jq)","")
-	@echo installing jq 
+	@echo installing jq
 	@sudo apt-get install -y jq
-endif  
+endif
 ifeq ("$(wildcard /usr/bin/parallel)","")
-	@echo installing parallel 
-	@sudo apt-get install -y parallel 
-endif  
+	@echo installing parallel
+	@sudo apt-get install -y parallel
+endif
 ifeq ("$(wildcard /usr/local/bin/docker-compose)","")
 	@echo installing docker-compose
 	@sudo curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
@@ -93,12 +94,12 @@ index-purge: network elasticsearch
 	@echo
 
 index-create: network elasticsearch
-ifeq ("$(shell docker exec -it ${APP}-elasticsearch curl -XGET 'localhost:9200/${dataset}' | grep mapping | wc -l)","1")
+ifeq ("$(shell docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -XGET 'localhost:9200/${dataset}' | grep mapping | wc -l)","1")
 else
 	@echo
-	@docker exec -it ${APP}-elasticsearch curl -s -H "Content-Type: application/json" -XPUT localhost:9200/${dataset} -d '{"settings": ${settings}, "mappings": { "${dataset}": ${mapping}}}' | sed 's/{"acknowledged":true.*/${dataset} index created with mapping\n/'
-	@docker exec -it ${APP}-elasticsearch curl -s -XPUT localhost:9200/contact | sed 's/{"acknowledged":true.*/contact index created\n/'
-	@docker exec -it ${APP}-elasticsearch curl -s -XPUT localhost:9200/feedback | sed 's/{"acknowledged":true.*/feedback created\n/'
+	@docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -s -H "Content-Type: application/json" -XPUT localhost:9200/${dataset} -d '{"settings": ${settings}, "mappings": { "${dataset}": ${mapping}}}' | sed 's/{"acknowledged":true.*/${dataset} index created with mapping\n/'
+	@docker exec -i ${USER_TTY} ${APP}-elasticsearch curl -s -XPUT localhost:9200/contact | sed 's/{"acknowledged":true.*/contact index created\n/'
+	@docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -s -XPUT localhost:9200/feedback | sed 's/{"acknowledged":true.*/feedback created\n/'
 	@echo
 	@echo wating a few seconds for index being up
 	@sleep 10
@@ -106,8 +107,8 @@ else
 endif
 
 index-status: network elasticsearch
-	@docker exec -it ${APP}-elasticsearch curl -XGET localhost:9200/${dataset}?pretty
-	@docker exec -it ${APP}-elasticsearch curl -XGET localhost:9200/_cat/indices
+	@docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -XGET localhost:9200/${dataset}?pretty
+	@docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -XGET localhost:9200/_cat/indices
 
 index-load: index-create
 ifeq ("$(wildcard ${datasource})","")
@@ -116,7 +117,7 @@ endif
 ifeq ("$(shell docker exec -it ${APP}-elasticsearch curl -XGET 'localhost:9200/${dataset}' | grep mapping | wc -l)","1")
 	@# split -l ${ES_CHUNK} --filter=
 	@# parallel : parallel --no-notice --block-size 10M -N ${ES_CHUNK} -j${ES_JOBS} --pipe
-	@gpg --quiet --batch --yes --passphrase "${PASSPHRASE}" -d ${datasource} | gunzip | awk 'BEGIN{n = 1;print "decrypting data - injection into elasticsearch will begin from line ${FROM}" > "/dev/stderr"; print ${header}}{if ((n == 1) || (n>=${FROM})) {print};if ((n%1000000)==0) {print "decrypted " n " lines" > "/dev/stderr"} n++}' |  perl -e 'while(<>){s/\"(.*?);(.*?)\"/\1,\2/g;print}' | perl -e '$$header=1;while(<>){ chomp;if ($$header) {@fields=split(/;/,$$_);$$header=0; }else {print "{\"index\": {\"_index\": \"'"${dataset}"'\", \"_type\": \"'"${dataset}"'\"}}\n";$$i=0;print "{".join(", ",map("\"@fields[$$i++]\": \"$$_\"",split(/;/,$$_)))."}\n";}}'| sed 's/\\//g;s/""/"/g;s/ ",/ "",/g;s/"{/{/g;s/}"/}/g;s/"\[/[/g;s/\]"/]/g' | parallel --no-notice --block-size 10M -N ${ES_CHUNK} -j${ES_JOBS} --pipe 'docker exec -i ${APP}-elasticsearch curl -s -H "Content-Type: application/json" localhost:9200/_bulk  --data-binary @-;echo ' | jq -c '.items[].index.result' | awk 'BEGIN{ok=${FROM}-1;ko=0}{if ($$1 == "\"created\"") { ok++ } else {ko++} if (((ok+ko)%${ES_VERBOSE} == 0)) {print strftime("%Y%m%d-%H:%M") " indexed:" ok " rejected:" ko}}'
+	@((zcat ${datasource}) || (gpg --quiet --batch --yes --passphrase "${PASSPHRASE}" -d ${datasource_crypt} | gunzip)) | awk 'BEGIN{n = 1;print "decrypting data - injection into elasticsearch will begin from line ${FROM}" > "/dev/stderr"; print ${header}}{if ((n == 1) || (n>=${FROM})) {print};if ((n%1000000)==0) {print "decrypted " n " lines" > "/dev/stderr"} n++}' |  perl -e 'while(<>){s/\"(.*?);(.*?)\"/\1,\2/g;print}' | perl -e '$$header=1;while(<>){ chomp;if ($$header) {@fields=split(/;/,$$_);$$header=0; }else {print "{\"index\": {\"_index\": \"'"${dataset}"'\", \"_type\": \"'"${dataset}"'\"}}\n";$$i=0;print "{".join(", ",map("\"@fields[$$i++]\": \"$$_\"",split(/;/,$$_)))."}\n";}}'| sed 's/\\//g;s/""/"/g;s/ ",/ "",/g;s/"{/{/g;s/}"/}/g;s/"\[/[/g;s/\]"/]/g' | parallel --no-notice --block-size 10M -N ${ES_CHUNK} -j${ES_JOBS} --pipe 'docker exec -i ${APP}-elasticsearch curl -s -H "Content-Type: application/json" localhost:9200/_bulk  --data-binary @-;echo ' | jq -c '.items[].index.result' | awk 'BEGIN{ok=${FROM}-1;ko=0}{if ($$1 == "\"created\"") { ok++ } else {ko++} if (((ok+ko)%${ES_VERBOSE} == 0)) {print strftime("%Y%m%d-%H:%M") " indexed:" ok " rejected:" ko}}'
 	@docker exec -it ${APP}-elasticsearch curl -XPUT localhost:9200/${dataset}/_settings -H 'content-type:application/json' -d'{"index.refresh_interval": "1s", "index.blocks.read_only": true}'
 endif
 
@@ -124,7 +125,7 @@ endif
 index-test:
 ifeq ("$(shell docker exec -it ${APP}-elasticsearch curl -XGET 'localhost:9200/${dataset}' | grep mapping | wc -l)","1")
 	@echo index test
-	@gpg --quiet --batch --yes --passphrase "${PASSPHRASE}" -d sample_data/siv.csv.gz.gpg | gunzip| awk -F ';' 'BEGIN{n=0}{n++;if (n>1){print $$1}}' | parallel --no-notice -j1 'curl -s -XGET localhost:${PORT}/histovec/api/v0/id/{} ' | jq -c '{"took": .took, "hit": .hits.total}' 
+	@gpg --quiet --batch --yes --passphrase "${PASSPHRASE}" -d sample_data/siv.csv.gz.gpg | gunzip| awk -F ';' 'BEGIN{n=0}{n++;if (n>1){print $$1}}' | parallel --no-notice -j1 'curl -s -XGET localhost:${PORT}/histovec/api/v0/id/{} ' | jq -c '{"took": .took, "hit": .hits.total}'
 endif
 
 index-stress:
@@ -166,19 +167,28 @@ ifeq ("$(wildcard ${BACKEND}/esdata/)","")
 	@mkdir -p ${BACKEND}/esdata
 	@chmod 777 ${BACKEND}/esdata/.
 endif
-	@docker-compose -f ${DC_PREFIX}-elasticsearch.yml up -d 2>&1 | grep -v orphan
+	@${DC} -f ${DC_PREFIX}-elasticsearch.yml up -d 2>&1 | grep -v orphan
 
 elasticsearch-stop:
 	${DC} -f ${DC_PREFIX}-elasticsearch.yml down
 
-backend-stop:
-	${DC} -f ${DC_PREFIX}-backend.yml down
+first-backup:
+	@mkdir -p ${BACKEND}/backup/esdata && \
+		echo `date +'%Y%m%d_%H:%M'` first rsync && \
+		rsync -a ${BACKEND}/esdata/. ${BACKEND}/backup/esdata/. 
+last-backup:
+	@mkdir -p ${BACKEND}/backup/esdata && \
+		echo `date +'%Y%m%d_%H:%M'` last rsync && \
+		rsync -a ${BACKEND}/esdata/. ${BACKEND}/backup/esdata/.
 
-backend: network
-	${DC} -f ${DC_PREFIX}-backend.yml up --build -d 2>&1 | grep -v orphan
+post-backup:
+	@echo `date +'%Y%m%d_%H:%M'` taring && \
+        	cd ${BACKEND}/backup/ && tar cf `date +%Y%m%d`_histovec.tar esdata/.
+		echo `date +'%Y%m%d_%H:%M'` cleaning tmp dir && \
+		rm -rf ${BACKEND}/backup/esdata && \
+		echo `date +'%Y%m%d_%H:%M'` backup done in ${BACKEND}/backup/`date +%Y%m%d`_histovec.tar
 
-backend-log:
-	${DC} -f ${DC_PREFIX}-backend.yml logs --build -d 2>&1 | grep -v orphan
+backup: first-backup elasticsearch-stop last-backup elasticsearch post-backup
 
 frontend-dev: network tor
 	@echo docker-compose up frontend for dev ${VERSION}
@@ -205,6 +215,15 @@ frontend-build: network
 	@sudo rsync -avz --delete ${FRONTEND}/dist-build/. ${FRONTEND}/dist/.
 
 build: frontend-build
+
+update:
+	git pull
+	@echo building ${APP} frontend
+	@echo building frontend in ${FRONTEND}
+	@sudo mkdir -p ${FRONTEND}/dist-build
+	${DC} -f ${DC_PREFIX}-build-frontend.yml up --build 2>&1 | grep -v orphan
+	mkdir -p ${FRONTEND}/dist/
+	@sudo rsync -avz --delete ${FRONTEND}/dist-build/. ${FRONTEND}/dist/.
 
 frontend-stop:
 	@${DC} -f ${DC_PREFIX}-run-frontend.yml down

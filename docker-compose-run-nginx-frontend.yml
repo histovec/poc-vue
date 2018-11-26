@@ -1,0 +1,26 @@
+version: '2'
+
+networks:
+  default:
+    external:
+      name: ${APP}
+
+services:
+  nginx:
+    build:
+      context: nginx
+      dockerfile: Dockerfile.build
+      args:
+        app_name: ${APP}
+        app_ver: ${APP_VERSION}
+    image: ${APP}-nginx:${APP_VERSION}
+    container_name: ${APP}-nginx
+    environment:
+      - APP=${APP}
+      - ES_HOST=${ES_HOST}
+      - dataset=${dataset}
+    volumes:
+      - ${LOGS}/nginx:/var/log/nginx/
+    ports:
+      - ${PORT}:80
+    restart: always

@@ -36,7 +36,7 @@
                   <div class="media margin-clear">
                     <nav>
                       <ul class="nav nav-pills nav-stacked">
-                        <li><a href="faq">FAQ</a></li>
+                        <li><a href="faq">Besoin d'aide</a></li>
                         <li><a :href="'mailto:histovec@interieur.gouv.fr?subject=Contact%20Histovec'">CONTACT</a></li>
                         <li><a :href="'mailto:histovec@interieur.gouv.fr?subject=Signaler%20une%20erreur'">Signaler une erreur</a></li>
                       </ul>
@@ -115,9 +115,21 @@ Vue.mixin({
     }
   },
   mounted () {
+    if (this.$cookie.get('userId') === null) {
+      this.$cookie.set('userId', this.guid(), 1)
+      this.$store.commit('updateCookie', this.$cookie.get('userId'))
+    }
     window.bus.$on('langChange', value => {
       this.lang = value
     })
+  },
+  methods: {
+    guid () {
+      return this.s4() + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' + this.s4() + this.s4() + this.s4()
+    },
+    s4 () {
+      return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1)
+    }
   }
 })
 

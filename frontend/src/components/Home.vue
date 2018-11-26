@@ -1,10 +1,10 @@
 <template>
     <main role="main">
       <!-- section start -->
-<div class="banner banner-big-height padding-bottom-clear" style="background-image:url('assets/images/accueil_1.jpg');background-position: 50% 10%;">
+<div class="banner banner-big-height padding-bottom-clear" style="background-image:url('assets/images/accueil_4.jpg'); background-size: 1200px; background-position: 50% -100px;">
   <div class="container">
     <div class="row justify-content-lg-center">
-      <div class="col-lg-12 text-center pv-20">
+      <div class="col-lg-12 text-center pv-20 pvm0">
         <h1 class="title color-white">Jouez la transparence</h1>
         <p class="text-center color-white txt-small-20">En partageant l'historique du véhicule</p>
       </div>
@@ -106,7 +106,7 @@
               <div class="pv-30 ph-20 feature-box bordered shadow text-center object-non-visible animated object-visible fadeInDownSmall" data-animation-effect="fadeInDownSmall" data-effect-delay="100"> <span class="icon default-bg circle"><i class="fa fa-thumbs-o-up"></i></span>
                 <h3>Officiel</h3>
                 <div class="separator clearfix"></div>
-                <p>Données officilelles du <span class="text-defaut text-defaut-i-g">Ministère de l’Intérieur</span> issues du <a target="_blank" title="Système d'Immatriculation des Véhicules" href="https://immatriculation.ants.gouv.fr/Tout-savoir-sur-le-SIV/Le-Systeme-d-Immatriculation-des-Vehicules-SIV">SIV</a></p>
+                <p>Données officielles du <span class="text-defaut text-defaut-i-g">Ministère de l’Intérieur</span> issues du <a target="_blank" title="Système d'Immatriculation des Véhicules" href="https://immatriculation.ants.gouv.fr/Tout-savoir-sur-le-SIV/Le-Systeme-d-Immatriculation-des-Vehicules-SIV">SIV</a></p>
               </div>
             </div>
             <div class="col-lg-4">
@@ -137,7 +137,7 @@
 </div>
 
       <!-- section start -->
-      <section class="dark-translucent-bg fixed-bg" style="background-image:url(assets/images/tableau_de_bord/41.jpg);">
+      <section class="dark-translucent-bg fixed-bg" style="background-image:url(assets/images/clavier.jpg);">
         <div class="container">
           <div class="row justify-content-lg-center">
             <div class="col-lg-12">
@@ -217,6 +217,7 @@ export default {
     }
   },
   created () {
+    this.$http.put(this.apiUrl + 'log/' + this.$route.path.replace(/^\/\w+\//, '')).then(response => {}, () => {})
     setInterval(() => {
       this.verbatim = false
       this.i = (this.i + 1) % this.verbatims.length

@@ -1,24 +1,31 @@
-# Histovec bêta
+# HistoVec : Acheter un véhicule d’occasion en confiance
 
-Cette application est la version bêta en Vue.js permettant l'édition de rapports dans le cadre de la mesure n°16 du CISR du 9 janvier 2018. Cette version vise à être mise en service au 24 mai 2018 pour une ouverture en test auprès de premiers usagers.
+HistoVec permet au vendeur de partager à un acheteur intéressé l’historique des faits marquants du véhicule enregistrés dans le fichier national du SIV (Système d’Immatriculation des Véhicules), notamment :
 
-Il intègre trois vues:
-- Home : page d'introduction du site
-- Search : page de recherche pro ou particulier
-- Report: page de rapport de l'historique du véhicule
+    la date de mise en circulation,
+    les changements de propriétaire,
+    les sinistres à réparation contrôlée,
+    la situation administrative (gage, opposition, vol)
+    etc.
+
+Ainsi, HistoVec permet à l’acheteur d’acheter en connaissance de cause, et au vendeur honnête de valoriser son offre.
+
+# Version bêta [en ligne](https://histovec.interieur.gouv.fr)
+
+La version bêta est une version rapide mais homologuée par le ministère de l'Intérieur destinée à piloter une expérimentation avec les usagers, avant une généralisation d'ici la fin 2018.
+
+Le code source du présent site comporte l'ensemble des éléments fonctionnels (frontend), et bien sûr ne comporte pas les données, ni les configurations de déploiement.
 
 ## données personnelles
-Les données en base sont intégralement chiffrées en AES256, et les données personnelles hashées (SHA256).
+Les données en base d'Histovec sont intégralement chiffrées en AES256, et les données personnelles hashées (SHA256).
 
 ## composants
-Le POC intègre les composants suivants :
+La version disponible sur le site fonctionne sur la base des composants suivants :
 - nginx
 - Boostrap 3
 - Vue.js 2
 - Elasticsearch 6
-- docker
-
-L'environnement lance de plus un backend Python 3, mais à ce stade inutile.
+- Docker
 
 ## collaborez en mode développeur
 ```
@@ -51,17 +58,29 @@ make index-purge
 
 ## tester l'application
 
-- rendez-vous sur : http://localhost:8088
+- rendez-vous sur : http://localhost
 - depuis la page d'accueil,  cliquez sur "vendeur" ou "professionnel"
 - sur la parge de recherche (mode "vendeur"), entrez les données de la personnes physique (nom, prénom, date de naissance) ou morale (raison sociale, n° SIREN) et les données identifiantes du véhicule (n° d'immatriculaion, n° de formule)
 - vous obtenez le rapport. Cliquez sur "Transmettre le rapport" pour obtenir les liens à transmettre à l'acheteur. Celui-ci peut êre copié, envoyé par mail, sms ou QR-code.
 
+## compiler
+
+pour compiler la version statique :
+```
+make build
+make up
+```
 
 ## limitations
-- seul l'environnement docker de dev fonction, la chaîne de compilation n'est pas encore constitutée
-- les restitutions de la synthèse sont encore partielles
-- le texte de la homepage est encore à revoir
+- version mono-noeud elasticsearch
+- pas d'api pro à ce stade
+- pas de donnée de test
 
 ## source
 Le code a été développé en quelques heures à partir de :
 https://github.com/rhanka/vue-python-docker-dev-kit
+
+## Etat du code
+
+[![Build Status](https://travis-ci.org/histovec/histovec-beta.svg?branch=dev)](https://travis-ci.org/histovec/histovec-beta)
+

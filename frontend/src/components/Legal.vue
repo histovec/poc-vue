@@ -15,7 +15,7 @@
     <div class="container">
       <div class="row">
         <!-- section start -->
-        <section class="dark-translucent-bg" style="background-image:url(assets/images/poignee_de_main.png);">
+        <section class="dark-translucent-bg" style="background-image:url(assets/images/poignee_de_main.jpg); background-position: 50% 50%">
           <div class="container">
             <div class="row justify-content-lg-center">
               <div class="col-lg-12">
@@ -59,7 +59,7 @@
               <p>Ces éléments sont couverts par des droits de propriété intellectuelle de tiers. En application du code de la propriété intellectuelle, toute reproduction ou représentation partielle ou totale pour quelque usage que ce soit est interdite sans l'accord préalable des titulaires de droits. Pour toute demande de reproduction, <a :href="'mailto:histovec@interieur.gouv.fr?subject=Demande%20de%20reproduction'">contactez-nous</i></a></p>
               <p>Sauf mention contraire, les photographies sont issues du site <a href="http://picjumbo.com">picjumbo.com</a> et libres de droits.</p>
           <h5>Conception et réalisation</h5>
-              Conception et réalisation Lab <a href="https://www.interieur.gouv.fr/Le-ministere/Secretariat-general/Direction-des-systemes-d-information-et-de-communication">DSIC</a> du ministère de l'Intérieur avec le Bureau des immatriculations de la Délégation à la sécurité routière (<a href="http://www.securite-routiere.gouv.fr/la-securite-routiere/qui-sommes-nous/la-delegation-a-la-securite-routiere">DSR</a>)
+              Conception et réalisation Lab <a href="https://www.interieur.gouv.fr/Le-ministere/Secretariat-general/Direction-des-systemes-d-information-et-de-communication">DSIC</a> du ministère de l'Intérieur avec le Bureau de l'expertise automobile (BEA) de la Délégation à la sécurité routière (<a href="http://www.securite-routiere.gouv.fr/la-securite-routiere/qui-sommes-nous/la-delegation-a-la-securite-routiere">DSR</a>)
 
               <h6> Liens hypertextes entrants </h6>
               Tout site public ou privé est autorisé à établir, sans autorisation préalable, un lien vers les informations diffusées dans ce site.
@@ -74,7 +74,7 @@
               <h6>Droit d’auteur</h6>
               Les contenus disponibles sur ce site sont protégés par le droit d’auteur. Au terme de l’article L. 122-4 du Code de la propriété intellectuelle, vous ne pouvez reproduire tout ou partie de ces œuvres sans en avoir obtenu l’autorisation expresse au préalable.
               <h6>Code applicatif open source</h6>
-              Conformément à la <a href="https://www.legifrance.gouv.fr/affichLoiPubliee.do?idDocument=JORFDOLE000031589829&type=general&legislature=14">loi pour une République numérique</a>, le code de l'application Histovec est libre et opensource, publié sous <a href="https://www.gnu.org/licenses/lgpl-3.0.fr.html">licence LGPL</a>.
+              Conformément à la <a href="https://www.legifrance.gouv.fr/affichLoiPubliee.do?idDocument=JORFDOLE000031589829&type=general&legislature=14">loi pour une République numérique</a>, le code de l'application Histovec est libre et opensource, publié sous <a href="https://www.gnu.org/licenses/lgpl-3.0.fr.html">licence LGPL</a> sur <a href="https://github.com/histovec/histovec-beta">Github</a>.
               <h6>Limitations de responsabilité</h6>
               Le site HistoVec fournit les informations issues du Système d’Immatriculation des Véhicules (SIV).
               La responsabilité de l'Editeur ne peut être engagée sur des inexactitudes concernant les informations fournies, qu’elles proviennent d’erreurs issues du Système d’Immatriculation des Véhicules, ou d’anomalies de traitement informatique.
@@ -119,14 +119,14 @@
                 <li>numéro de formule du certificat d’immatriculation (donnée inscrite uniquement sur le titre) </li>
               </ul>
               <h6>Mesures de protection des données</h6>
-              Les données personnelles sont protégées par les moyens suivants : 
+              Les données personnelles sont protégées par les moyens suivants :
               <ul>
                 <li>Aucune donnée nominative du vendeur et du véhicule n’est stockée au-delà de la session : les données personnelles sont combinées puis hachées (SHA256) avant d’être stockées en tant que clé de recherche. </li>
                 <li>Aucune information personnelle n’est affichée sur le site : seules les premières lettres du nom et prénom sont affichées, ainsi que les premières et dernières lettres du numéro d’immatriculation pour permettre à l’utilisateur de vérifier qu’il s’agit bien de la bonne information</li>
                 <li>Les échanges avec le site HistoVec sont sécurisés par le protocole https, et par ailleurs, les données du véhicule sont chiffrées (AES256) en base et ne sont déchiffrées que sur le navigateur, grâce à une combinaison hachée de la plaque et de l'immatriculation</li>
                 <li>Le service est hébergé sur les serveurs du Ministère de l’intérieur</li>
                 <li>L’acheteur consulte le rapport exclusivement à partir du lien, fourni par le vendeur, et dispose exactement du même de rapport que le vendeur</li>
-                <li>Ce lien est temporaire, valable le mois en cours et le suivant.
+                <li>Ce lien est temporaire, valable le mois en cours et le suivant. </li>
               </ul>
               <!-- accordion start -->
               <!-- ================ -->
@@ -200,6 +200,9 @@ export default {
     return {
       choice: ''
     }
+  },
+  created () {
+    this.$http.put(this.apiUrl + 'log/' + this.$route.path.replace(/^\/\w+\//, '')).then(response => {}, () => {})
   },
   methods: {
     choose (id) {

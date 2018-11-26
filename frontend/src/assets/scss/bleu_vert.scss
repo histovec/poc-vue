@@ -526,3 +526,22 @@ header:not(.dark) .mega-menu .menu > li > a:hover i, header:not(.dark) .dropdown
 #fp-nav ul li a span, .fp-slidesNav ul li a span {
     background: rgba(42, 164, 165, 0.8) none repeat scroll 0 0;
 }
+
+.rating {
+    direction: rtl;
+}
+.rating a {
+    color: #aaa;
+    text-decoration: none;
+    font-size: 1.7em;
+    transition: color .4s;
+}
+.rating a.is-selected {
+    color: orange;
+}
+.rating a:hover {
+    cursor: pointer
+}
+.rating a.is-disabled:hover {
+    cursor: default;
+}

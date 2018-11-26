@@ -6,3 +6,6 @@ frontend/dist
 infrastructure/heat-templates/CIT/param/*
 infrastructure/heat-templates/floating-ip/param/*
 .lastcommit
+histovec-build
+*.tar.gz
+*.tar

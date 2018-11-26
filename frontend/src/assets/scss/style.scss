@@ -38,7 +38,7 @@
 }
 
 .modal-body {
-  margin: 20px 0;
+  margin: 0 auto;
 }
 
 .modal-default-button {
@@ -76,4 +76,8 @@
 /* .slide-fade-leave-active below version 2.1.8 */ {
   transform: translateX(100px);
   opacity: 0;
+}
+
+@media only screen and (max-width: 767px) {
+.pvm0 { margin-top: -50px; }
 }

@@ -1,0 +1,228 @@
+##############################################
+# WARNING : THIS FILE SHOULDN'T BE TOUCHED   #
+#    FOR ENVIRONNEMENT CONFIGURATION         #
+# CONFIGURABLE VARIABLES SHOULD BE OVERRIDED #
+# IN THE 'artifacts' FILE, AS NOT COMMITTED  #
+##############################################
+
+include Makefile
+
+export BUILD_DIR=${APP_PATH}/histovec-build
+
+export NPM_REGISTRY = $(shell echo $$NPM_REGISTRY )
+export SASS_REGISTRY = $(shell echo $$SASS_REGISTRY )
+dollar = $(shell echo \$$)
+
+#
+DC_BUILD_ARGS = --pull --no-cache
+# docker-compose file
+DC_BUILD_FRONTEND     = ${DC_PREFIX}-build-deploy-frontend.yml
+DC_RUN_NGINX_FRONTEND = ${DC_PREFIX}-run-nginx-frontend.yml
+DC_ELASTICSEARCH      = ${DC_PREFIX}-elasticsearch.yml
+
+# builded file
+FILE_FRONTEND_APP_VERSION = $(APP)-$(APP_VERSION)-frontend.tar.gz
+FILE_FRONTEND_DIST_APP_VERSION = $(APP)-$(APP_VERSION)-frontend-dist.tar.gz
+FILE_FRONTEND_DIST_LATEST_VERSION = $(APP)-latest-frontend-dist.tar.gz
+
+FILE_IMAGE_NGINX_APP_VERSION = $(APP)-nginx-$(APP_VERSION)-image.tar
+FILE_IMAGE_NGINX_LATEST_VERSION = $(APP)-nginx-latest-image.tar
+FILE_IMAGE_ELASTICSEARCH_APP_VERSION = $(APP)-elasticsearch-$(APP_VERSION)-image.tar
+FILE_IMAGE_ELASTICSEARCH_LATEST_VERSION = $(APP)-elasticsearch-latest-image.tar
+
+FILE_ARCHIVE_APP_VERSION = $(APP)-$(APP_VERSION)-archive.tar.gz
+FILE_ARCHIVE_LATEST_VERSION = $(APP)-latest-archive.tar.gz
+
+PUBLISH_URL_BASE           = histovec-docker-images
+PUBLISH_URL_APP_VERSION    = $(PUBLISH_URL_BASE)/$(APP_VERSION)
+PUBLISH_URL_LATEST_VERSION = $(PUBLISH_URL_BASE)/latest
+
+# Publish configuration
+export openstack_url = $(shell echo $$openstack_url )
+export openstack_auth_id = $(shell echo $$openstack_auth_id )
+export openstack_token = $(shell echo $$openstack_token )
+
+#
+# build-all
+#
+
+build-all: build-dir build-archive build-all-images save-images
+
+save-images: elasticsearch-save-image nginx-save-image
+
+build-all-images: build-dir frontend-build-all nginx-build elasticsearch-build
+
+build-archive: clean-archive build-dir
+	@echo "Build $(APP) $(APP)-$(APP_VERSION) archive"
+	echo "$(APP_VERSION)" > VERSION ; cp VERSION $(BUILD_DIR)/$(APP)-VERSION
+	tar -zcvf $(BUILD_DIR)/$(FILE_ARCHIVE_APP_VERSION) --exclude $$(basename $(BUILD_DIR)) --exclude nginx/*.tar.gz --exclude frontend/*.tar.gz *
+	@echo "Build $(APP) $(APP)-latest archive"
+	cp $(BUILD_DIR)/$(FILE_ARCHIVE_APP_VERSION) $(BUILD_DIR)/$(FILE_ARCHIVE_LATEST_VERSION)
+
+clean-archive:
+	@echo "Clean $(APP) archive"
+	rm -rf $(FILE_ARCHIVE_APP_VERSION)
+
+
+build-dir:
+	if [ ! -d "$(BUILD_DIR)" ] ; then mkdir -p $(BUILD_DIR) ; fi
+
+build-dir-clean:
+	if [ -d "$(BUILD_DIR)" ] ; then rm -rf $(BUILD_DIR) ; fi
+
+frontend-build-all: network frontend-build-dist frontend-build-dist-archive
+
+frontend-build-dist: frontend-prepare-build frontend-check-build
+	@echo building ${APP} frontend
+	@echo building frontend in ${FRONTEND}
+	APP="$(APP)" FRONTEND="$(FRONTEND)" http_proxy="$(http_proxy)" NPM_REGISTRY="$(NPM_REGISTRY)" SASS_REGISTRY="$(SASS_REGISTRY)" \
+	  ${DC} -f $(DC_BUILD_FRONTEND) build $(DC_BUILD_ARGS)
+
+frontend-prepare-build:
+	if [ -f "${FRONTEND}/$(FILE_FRONTEND_APP_VERSION)" ] ; then rm -rf ${FRONTEND}/$(FILE_FRONTEND_APP_VERSION) ; fi
+	( cd ${FRONTEND} && tar -zcvf $(FILE_FRONTEND_APP_VERSION) --exclude ${APP}.tar.gz \
+          index.html \
+         .babelrc \
+         .editorconfig \
+         .eslintignore \
+         .eslintrc.js \
+         config \
+         src \
+         build \
+         static )
+
+frontend-check-build:
+	${DC} -f $(DC_BUILD_FRONTEND) config -q
+
+frontend-build-dist-archive:
+	APP="$(APP)" FRONTEND="$(FRONTEND)" http_proxy="$(http_proxy)" NPM_REGISTRY="$(NPM_REGISTRY)" SASS_REGISTRY="$(SASS_REGISTRY)" \
+	  ${DC} -f $(DC_BUILD_FRONTEND) run -T --rm build-frontend tar zCcf $$(dirname /$(APP)/dist) - $$(basename /$(APP)/dist)  > $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION)
+	  cp $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) $(BUILD_DIR)/$(FILE_FRONTEND_DIST_LATEST_VERSION)
+	if [ -f $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) ]; then ls -alsrt  $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) && sha1sum $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) ; fi
+	if [ -f $(BUILD_DIR)/$(FILE_FRONTEND_DIST_LATEST_VERSION) ]; then ls -alsrt  $(BUILD_DIR)/$(FILE_FRONTEND_DIST_LATEST_VERSION) && sha1sum $(BUILD_DIR)/$(FILE_FRONTEND_DIST_LATEST_VERSION) ; fi
+
+frontend-clean-dist:
+	@rm -rf $(FILE_FRONTEND_APP_VERSION)
+
+frontend-clean-dist-archive:
+	@rm -rf $(FILE_FRONTEND_DIST_APP_VERSION)
+
+clean-image: frontend-clean-image nginx-clean-image elasticsearch-clean-image
+
+frontend-clean-image:
+	@( ${DC} -f $(DC_BUILD_FRONTEND) config | \
+           python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' | \
+           jq -r '.services[] | . as $(dollar)a | select($(dollar)a.build) | .image' ) | while read image_name ; do \
+           docker rmi $$image_name || true ; \
+        done
+
+nginx-clean-image:
+	@( ${DC} -f $(DC_RUN_NGINX_FRONTEND) config | \
+           python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' | \
+           jq -r '.services[] | . as $(dollar)a | select($(dollar)a.build) | .image' ) | while read image_name ; do \
+           docker rmi $$image_name || true ; \
+        done
+
+elasticsearch-clean-image:
+	@( ${DC} -f $(DC_ELASTICSEARCH) config | \
+           python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' | \
+           jq -r '.services[] | . as $(dollar)a | select($(dollar)a.build) | .image' ) | while read image_name ; do \
+           docker rmi $$image_name || true ; \
+        done
+
+elasticsearch-build: elasticsearch-build-image
+
+elasticsearch-build-image: elasticsearch-check-build
+	@echo building ${APP} elasticsearch
+	${DC} -f $(DC_ELASTICSEARCH) pull
+	${DC} -f $(DC_ELASTICSEARCH) build $(DC_BUILD_ARGS)
+
+elasticsearch-check-build:
+	${DC} -f $(DC_ELASTICSEARCH) config -q
+
+elasticsearch-save-image:
+	elasticsearch_image_name=$$(${DC} -f $(DC_ELASTICSEARCH) config | python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' | jq -r .services.elasticsearch.image); \
+	  docker image save -o  $(BUILD_DIR)/$(FILE_IMAGE_ELASTICSEARCH_APP_VERSION) $$elasticsearch_image_name ; \
+	  docker image save -o  $(BUILD_DIR)/$(FILE_IMAGE_ELASTICSEARCH_LATEST_VERSION) $$elasticsearch_image_name
+
+nginx-build: nginx-build-image
+
+nginx-build-image: $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) nginx-check-build
+	@echo building ${APP} nginx
+#	${DC} -f $(DC_RUN_NGINX_FRONTEND) pull
+	cp $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) nginx/
+	${DC} -f $(DC_RUN_NGINX_FRONTEND) build $(DC_BUILD_ARGS)
+
+nginx-check-build:
+	${DC} -f $(DC_RUN_NGINX_FRONTEND) config -q
+
+nginx-save-image:
+	nginx_image_name=$$(${DC} -f $(DC_RUN_NGINX_FRONTEND) config | python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' | jq -r .services.nginx.image) ; \
+        nginx_image_name_version=$$(echo $$nginx_image_name | sed -e "s/\(.*\):\(.*\)/\1:$(APP_VERSION)/g") ; \
+        docker tag $$nginx_image_name $$nginx_image_name_version ; \
+	docker image save -o  $(BUILD_DIR)/$(FILE_IMAGE_NGINX_APP_VERSION) $$nginx_image_name_version ; \
+	docker image save -o  $(BUILD_DIR)/$(FILE_IMAGE_NGINX_LATEST_VERSION) $$nginx_image_name
+
+up-all: network-all elasticsearch frontend-nginx
+
+down-all: frontend-nginx-stop elasticsearch-stop network-stop
+
+network-all: install-prerequisites
+	@docker network create --opt com.docker.network.driver.mtu=1450 ${APP} 2> /dev/null; true
+
+frontend-nginx:
+	@${DC} -f $(DC_RUN_NGINX_FRONTEND) up -d 2>&1 | grep -v orphan
+
+frontend-nginx-stop:
+	@${DC} -f $(DC_RUN_NGINX_FRONTEND) down
+
+publish: publish-$(APP_VERSION) publish-latest
+
+publish-$(APP_VERSION):
+	@echo "Publish $(APP) $(APP_VERSION) artifacts"
+	if [ -z "$(openstack_url)" -o -z "$(openstack_auth_id)" -o -z "$(openstack_token)" ] ; then exit 1 ; fi
+	( cd $(BUILD_DIR) ;\
+	  ls -alrt ;\
+	    for file in \
+                $(APP)-VERSION \
+                $(FILE_ARCHIVE_APP_VERSION) \
+                $(FILE_FRONTEND_DIST_APP_VERSION) \
+                $(FILE_IMAGE_NGINX_APP_VERSION) \
+                $(FILE_IMAGE_ELASTICSEARCH_APP_VERSION) \
+           ; do \
+            curl -k -X PUT -T $$file -H 'X-Auth-Token: $(openstack_token)' $(openstack_url)/$(openstack_auth_id)/$(PUBLISH_URL_APP_VERSION)/$$file ; \
+           done ; \
+	  curl -k -H 'X-Auth-Token: $(openstack_token)' "$(openstack_url)/$(openstack_auth_id)/$(PUBLISH_URL_BASE)?prefix=${APP_VERSION}/&format=json" -s --fail | jq '.[] | [  .content_type, .hash, .last_modified , .name + ": " + (.bytes|tostring) ] | join(" ")' ; \
+	)
+
+publish-latest:
+	@echo "Publish $(APP) latest artifacts"
+	if [ -z "$(openstack_url)" -o -z "$(openstack_auth_id)" -o -z "$(openstack_token)" ] ; then exit 1 ; fi
+	( cd $(BUILD_DIR) ;\
+	    for file in \
+                $(APP)-VERSION \
+                $(FILE_ARCHIVE_LATEST_VERSION) \
+                $(FILE_FRONTEND_DIST_LATEST_VERSION) \
+                $(FILE_IMAGE_NGINX_LATEST_VERSION) \
+                $(FILE_IMAGE_ELASTICSEARCH_LATEST_VERSION) \
+           ; do \
+            curl -k -X PUT -T $$file -H 'X-Auth-Token: $(openstack_token)' $(openstack_url)/$(openstack_auth_id)/$(PUBLISH_URL_LATEST_VERSION)/$$file ; \
+           done ; \
+	  curl -k -H 'X-Auth-Token: $(openstack_token)' "$(openstack_url)/$(openstack_auth_id)/$(PUBLISH_URL_BASE)?prefix=latest/&format=json" -s --fail | jq '.[] | [  .content_type, .hash, .last_modified , .name + ": " + (.bytes|tostring) ] | join(" ")' ; \
+	)
+#
+# test up
+#
+SHELL:=/bin/bash
+test-up: wait-elasticsearch test-up-elasticsearch test-up-nginx test-up-$(APP)
+	echo "${APP} ${APP_VERSION} up and running"
+
+test-up-$(APP):
+	time bash tests/test-up-$(APP).sh
+test-up-nginx:
+	time bash tests/test-up-nginx.sh
+test-up-elasticsearch: wait-elasticsearch
+	time bash tests/test-up-elasticsearch.sh
+
+wait-elasticsearch:
+	timeout=120 ; ret=1 ; until [ "$$timeout" -le 0 -o "$$ret" -eq "0"  ] ; do docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -s --fail -XGET localhost:9200/_cat/indices ; ret=$$? ; echo "Wait $$timeout" ; ((timeout--)) ; sleep 1 ; done ; exit $$ret

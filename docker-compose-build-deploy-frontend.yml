@@ -1,0 +1,23 @@
+version: '2'
+
+# this docker configuation intends to build frontend
+# it is supposed that your declared some ENV variables:
+#   - ${FRONTEND} points to ${APP} frontend
+
+services:
+  build-frontend:
+    build:
+      context: ${FRONTEND}
+      dockerfile: Dockerfile.build-deploy
+      args:
+        proxy: ${http_proxy}
+        app_path: ${APP}
+        app_name: ${APP}
+        app_ver: ${APP_VERSION}
+        npm_registry: ${NPM_REGISTRY}
+        sass_registry: ${SASS_REGISTRY}
+    image: ${APP}-frontend:${APP_VERSION}
+    environment:
+      - APP=${APP}
+      - APP_VERSION=${APP_VERSION}
+    container_name: ${APP}-build-front

@@ -5,7 +5,7 @@
       <div class="container">
         <ol class="breadcrumb">
           <li><i class="fa fa-home pr-10"></i><a href="home">Accueil</a></li>
-          <li class="active">FAQ</li>
+          <li class="active">Besoin d'aide</li>
         </ol>
       </div>
     </div>
@@ -15,7 +15,7 @@
       <div class="container">
         <div class="row">
           <!-- section start -->
-          <section class="dark-translucent-bg" style="background-image:url(assets/images/poignee_de_main.png);">
+          <section class="dark-translucent-bg" style="background-image:url(assets/images/poignee_de_main.jpg); background-position: 50% 50%">
             <div class="container">
               <div class="row justify-content-lg-center">
                 <div class="col-lg-12">
@@ -42,7 +42,7 @@
           <!-- main start -->
           <div class="main col-md-12">
             <!-- page-title start -->
-            <h3 class="title"><span class="text-defaut">F</span>AQ</h3>
+            <h3 class="title"><span class="text-defaut">B</span>esoin d'aide</h3>
             <div class="separator-2"></div>
             <!-- page-title end -->
           </div>
@@ -53,14 +53,14 @@
     <div class="container">
       <div class="row">
         <div class="col-lg-12 mb-20">
-          <p>Voici les questions les plus fréquemment posées. Si vous ne trouvez pas dans cette liste la réponse à votre interrogation, <a :href="'mailto:histovec@interieur.gouv.fr?subject=Question%20FAQ'">contactez-nous</a></p>
+          <p>Voici les questions les plus fréquemment posées. Si vous ne trouvez pas dans cette liste la réponse à votre interrogation, <a :href="'mailto:histovec@interieur.gouv.fr?subject=Besoin%20d%20aide'">contactez-nous</a></p>
           <!-- accordion start -->
           <!-- ================ -->
           <div class="panel-group collapse-style-2" id="accordion-2">
             <!-- debut question 1 -->
-            <div class="panel panel-default">
+            <div id="a" class="panel panel-default">
               <div class="panel-heading">
-                <h4 class="panel-title"> <a @click="choose('a')" class="clickable" :class="[{'collapsed' : choice != 'a'}]"> <i class="fa fa-file-text-o pr-10"></i>Comment utiliser HistoVec ? </a> </h4>
+                <h4 class="panel-title"> <a href="#a" @click="choose('a')" class="clickable" :class="[{'collapsed' : choice != 'a'}]"> <i class="fa fa-file-text-o pr-10"></i>Comment utiliser HistoVec ? </a> </h4>
               </div>
               <div class="panel-collapse collapse" :class="[{'in' : choice === 'a'}]">
                 <div class="panel-body">
@@ -77,11 +77,11 @@
             </div>
             <!-- fin question 1 -->
             <!-- debut question 2 -->
-            <div class="panel panel-default">
+            <div id="b" class="panel panel-default">
               <div class="panel-heading">
-                <h4 class="panel-title"> <a @click="choose('b')" class="clickable" :class="[{'collapsed' : choice !== 'b' }]"> <i class="fa fa-file-text-o pr-10"></i>Comment retrouver mon rapport HistoVec ultérieurement ?</a> </h4>
+                <h4 class="panel-title"> <a href="#b" @click="choose('b')" class="clickable" :class="[{'collapsed' : choice !== 'b' }]"> <i class="fa fa-file-text-o pr-10"></i>Comment retrouver mon rapport HistoVec ultérieurement ?</a> </h4>
               </div>
-              <div class="panel-collapse collapse" :class="[{'in' : choice === 'b'}]">
+              <div  class="panel-collapse collapse" :class="[{'in' : choice === 'b'}]">
                 <div class="panel-body">
                   <UL>Le rapport généré est consultable pendant une période de 4 semaines aprés sa génération, grâce au lien qui a été fourni par le vendeur.</UL>
                 </div>
@@ -89,9 +89,9 @@
             </div>
             <!-- fin question 2 -->
             <!-- debut question 3 -->
-            <div class="panel panel-default">
+            <div id="c" class="panel panel-default">
               <div class="panel-heading">
-                <h4 class="panel-title"> <a @click="choose('c')" class="clickable" :class="[{'collapsed' : choice !== 'c' }]"> <i class="fa fa-file-text-o pr-10"></i>A qui s’adresse HistoVec ?</a> </h4>
+                <h4 class="panel-title"> <a href="#c" @click="choose('c')" class="clickable" :class="[{'collapsed' : choice !== 'c' }]"> <i class="fa fa-file-text-o pr-10"></i>A qui s’adresse HistoVec ?</a> </h4>
               </div>
               <div class="panel-collapse collapse" :class="[{'in' : choice === 'c'}]">
                 <div class="panel-body">
@@ -109,11 +109,11 @@
             </div>
             <!-- fin question 3 -->
             <!-- debut question 4 -->
-            <div class="panel panel-default">
+            <div id="d" class="panel panel-default">
               <div class="panel-heading">
-                <h4 class="panel-title"> <a @click="choose('d')" class="clickable" :class="[{'collapsed' : choice !== 'd' }]"> <i class="fa fa-file-text-o pr-10"></i>D’où proviennent les informations d’HistoVec ?</a> </h4>
+                <h4 class="panel-title"> <a href="#d" @click="choose('d')" class="clickable" :class="[{'collapsed' : choice !== 'd' }]"> <i class="fa fa-file-text-o pr-10"></i>D’où proviennent les informations d’HistoVec ?</a> </h4>
               </div>
-              <div class="panel-collapse collapse" :class="[{'in' : choice === 'd'}]">
+              <div  class="panel-collapse collapse" :class="[{'in' : choice === 'd'}]">
                 <div class="panel-body">
                   <UL>Les informations du rapport sont issues du système d’immatriculation des véhicules (SIV) du ministère de l’intérieur.</UL>
                 </div>
@@ -121,9 +121,9 @@
             </div>
             <!-- fin question 4 -->
             <!-- debut question 5 -->
-            <div class="panel panel-default">
+            <div id="e" class="panel panel-default">
               <div class="panel-heading">
-                <h4 class="panel-title"> <a @click="choose('e')" class="clickable" :class="[{'collapsed' : choice !== 'e' }]"> <i class="fa fa-file-text-o pr-10"></i>Comment consulter le rapport d’un véhicule qui ne m’appartient pas ?</a> </h4>
+                <h4 class="panel-title"> <a href="#e" @click="choose('e')" class="clickable" :class="[{'collapsed' : choice !== 'e' }]"> <i class="fa fa-file-text-o pr-10"></i>Comment consulter le rapport d’un véhicule qui ne m’appartient pas ?</a> </h4>
               </div>
               <div class="panel-collapse collapse" :class="[{'in' : choice === 'e'}]">
                 <div class="panel-body">
@@ -133,9 +133,9 @@
             </div>
             <!-- fin question 5 -->
             <!-- debut question 6 -->
-            <div class="panel panel-default">
+            <div id="f" class="panel panel-default">
               <div class="panel-heading">
-                <h4 class="panel-title"> <a @click="choose('f')" class="clickable" :class="[{'collapsed' : choice !== 'f' }]"> <i class="fa fa-file-text-o pr-10"></i>Quelles sont les garanties d’HistoVec ?</a> </h4>
+                <h4 class="panel-title"> <a href="#f" @click="choose('f')" class="clickable" :class="[{'collapsed' : choice !== 'f' }]"> <i class="fa fa-file-text-o pr-10"></i>Quelles sont les garanties d’HistoVec ?</a> </h4>
               </div>
               <div class="panel-collapse collapse" :class="[{'in' : choice === 'f'}]">
                 <div class="panel-body">
@@ -151,9 +151,9 @@
             </div>
             <!-- fin question 6 -->
             <!-- debut question 7 -->
-            <div class="panel panel-default">
+            <div id="g" class="panel panel-default">
               <div class="panel-heading">
-                <h4 class="panel-title"> <a @click="choose('g')" class="clickable" :class="[{'collapsed' : choice !== 'g' }]"> <i class="fa fa-file-text-o pr-10"></i>Est-ce que les informations sont complètes ?</a> </h4>
+                <h4 class="panel-title"> <a href="#g" @click="choose('g')" class="clickable" :class="[{'collapsed' : choice !== 'g' }]"> <i class="fa fa-file-text-o pr-10"></i>Est-ce que les informations sont complètes ?</a> </h4>
               </div>
               <div class="panel-collapse collapse" :class="[{'in' : choice === 'g'}]">
                 <div class="panel-body">
@@ -163,9 +163,9 @@
             </div>
             <!-- fin question 7 -->
             <!-- debut question8 -->
-            <div class="panel panel-default">
+            <div id="h" class="panel panel-default">
               <div class="panel-heading">
-                <h4 class="panel-title"> <a @click="choose('h')" class="clickable" :class="[{'collapsed' : choice !== 'h' }]"> <i class="fa fa-file-text-o pr-10"></i>Comment signaler une information manquante ou inexacte ?</a> </h4>
+                <h4 class="panel-title"> <a href="#h" @click="choose('h')" class="clickable" :class="[{'collapsed' : choice !== 'h' }]"> <i class="fa fa-file-text-o pr-10"></i>Comment signaler une information manquante ou inexacte ?</a> </h4>
               </div>
               <div class="panel-collapse collapse" :class="[{'in' : choice === 'h'}]">
                 <div class="panel-body">
@@ -175,14 +175,14 @@
             </div>
             <!-- fin question 9 -->
             <!-- debut question 9 -->
-            <div class="panel panel-default">
+            <div id="i" class="panel panel-default">
               <div class="panel-heading">
-                <h4 class="panel-title"> <a @click="choose('i')" class="clickable" :class="[{'collapsed' : choice !== 'i' }]"> <i class="fa fa-file-text-o pr-10"></i>Je ne trouve pas mon véhicule ?</a> </h4>
+                <h4 class="panel-title"> <a href="#i" @click="choose('i')" class="clickable" :class="[{'collapsed' : choice !== 'i' }]"> <i class="fa fa-file-text-o pr-10"></i>Je ne trouve pas mon véhicule ?</a> </h4>
               </div>
               <div class="panel-collapse collapse" :class="[{'in' : choice === 'i'}]">
                 <div class="panel-body">
-                  <UL>Recopiez exactement les données de la carte grise (nom, prénom,immatriculation, numéro de formule) et votre date naissance</UL>
-                  <UL>Seul les véhicules figurant dans le Sytème d'Immatriculation des Véhicules depuis 2009 peuvent être consultés dans Histovec</UL>
+                  <UL>Recopiez exactement les données de la carte grise (nom, prénom(s), immatriculation, numéro de formule) et votre date naissance</UL>
+                  <UL>Seuls les véhicules figurant dans le Sytème d'Immatriculation des Véhicules depuis 2009 peuvent être consultés dans Histovec</UL>
                   <UL> Il se peut aussi qu'il y ait une erreur sur la date de naissance enregistrée dans le système d’immatriculation des véhicules (SIV),</UL>
                   <UL><a :href="'mailto:histovec@interieur.gouv.fr?subject=Signaler%20une%20erreur'">contactez-nous</a></UL>
                 </div>
@@ -190,9 +190,9 @@
             </div>
             <!-- fin question 9 -->
             <!-- debut question 10 -->
-            <div class="panel panel-default">
+            <div id="j" class="panel panel-default">
               <div class="panel-heading">
-                <h4 class="panel-title"> <a @click="choose('j')" class="clickable" :class="[{'collapsed' : choice !== 'j' }]"> <i class="fa fa-file-text-o pr-10"></i>Je ne trouve pas le numéro de formule ?</a> </h4>
+                <h4 class="panel-title"> <a href="#j" @click="choose('j')" class="clickable" :class="[{'collapsed' : choice !== 'j' }]"> <i class="fa fa-file-text-o pr-10"></i>Je ne trouve pas le numéro de formule ?</a> </h4>
               </div>
               <div class="panel-collapse collapse" :class="[{'in' : choice === 'j'}]">
                 <div class="panel-body">
@@ -202,17 +202,40 @@
             </div>
             <!-- fin question 10 -->
             <!-- debut question 11 -->
-            <div class="panel panel-default">
+            <div id="k" class="panel panel-default">
               <div class="panel-heading">
-                <h4 class="panel-title"> <a @click="choose('k')" class="clickable" :class="[{'collapsed' : choicie !== 'k' }]"> <i class="fa fa-file-text-o pr-10"></i>Quelle est la politique de protection des données personnelles ?</a> </h4>
+                <h4 class="panel-title"> <a href="#k" @click="choose('k')" class="clickable" :class="[{'collapsed' : choice !== 'k' }]"> <i class="fa fa-file-text-o pr-10"></i>Que signifient les termes des opérations historiques ?</a> </h4>
               </div>
               <div class="panel-collapse collapse" :class="[{'in' : choice === 'k'}]">
+                <div class="panel-body">
+                  <UL><B>- Première immatriculation d'un véhicule neuf,</B> opération d'immatriculation d'un véhicule qui n'a jamais été immatriculé.</UL>
+                  <UL><B>- Première immatriculation à l'étranger,</B> le véhicule a été immatriculé en tant que véhicule neuf à l'étranger.</UL>
+                  <UL><B>- Première immatriculation d'un véhicule importé,</B> véhicule déjà immatriculé à l'étranger qui se fait immatriculer en France pour la première fois.</UL>
+                  <UL><B>- Conversion au nouveau format d'immatriculation,</B> changement d'immatriculation d'un véhicule passant du format 1234 ABC 56 au format AB-123-CD. </UL>
+                  <UL><B>- Cession (vente) par un particulier,</B> véhicule vendu par un particulier.</UL>
+                  <UL><B>- Changement de titulaire,</B> opération correspondant au moment où un particulier effectue sa demande de carte grise pour la mettre à son nom.</UL>
+                  <UL><B>- Achat ou reprise par un professionnel,</B>  opération correspondant au moment où un professionnel devient acquéreur du véhicule.</UL>
+                  <UL><B>- Fin d'usage démonstration pour vente du véhicule,</B> véhicule de garage ayant servi de véhicule de démonstration.</UL>
+                  <UL><B>- Opposition au transfert de la carte grise,</B> état bloquant tout changement de titulaire.</UL>
+                  <UL><B>- Procédure de réparation contrôlée,</B> procédure pendant laquelle les réparations sont contrôlées par un expert en automobile.</UL>
+                  <UL><B>- Premier rapport d'expert,</B> rapport de l'expert en automobile qui détermine la dangerosité du véhicule, établit la liste des réparations et en évalue le montant.</UL>
+                  <UL><B>- Second rapport d'expert,</B> rapport de l'expert en automobile qui indique notamment que le véhicule est apte à circuler dans des conditions normales de sécurité.</UL>
+                </div>
+              </div>
+            </div>
+            <!-- fin question 11 -->
+            <!-- debut question 20 -->
+            <div id="z" class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title"> <a href="#z" @click="choose('z')" class="clickable" :class="[{'collapsed' : choice !== 'z' }]"> <i class="fa fa-file-text-o pr-10"></i>Quelle est la politique de protection des données personnelles ?</a> </h4>
+              </div>
+              <div class="panel-collapse collapse" :class="[{'in' : choice === 'z'}]">
                 <div class="panel-body">
                   <UL>Vous pouvez les consulter dans <a href="legal">mentions légales.</a></UL>
                 </div>
               </div>
             </div>
-            <!-- fin question 11 -->
+            <!-- fin question 20 -->
           </div>
           <!-- accordion end -->
         </div>
@@ -227,8 +250,11 @@
 export default {
   data () {
     return {
-      choice: ''
+      choice: (window.location.href.split('#')[1] !== undefined) ? window.location.href.split('#')[1] : ''
     }
+  },
+  created () {
+    this.$http.put(this.apiUrl + 'log/' + this.$route.path.replace(/^\/\w+\//, '')).then(response => {}, () => {})
   },
   methods: {
     choose (id) {

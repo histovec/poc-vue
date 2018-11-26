@@ -38,6 +38,22 @@ server {
     proxy_http_version 1.1;
   }
 
+  location ~ "^/<APP>/api/v0/log/exit" {
+    if ($request_method != POST) {
+       return 403;
+    }
+    default_type application/json;
+    return 200 '{"status":"ok"}';
+  }
+
+  location ~ "^/<APP>/api/v0/log/.*" {
+    if ($request_method != PUT) {
+       return 403;
+    }
+    default_type application/json;
+    return 200 '{"status":"ok"}';
+  }
+
   location ~ ^/<APP>/api/v0/id/.* {
     return 404;
   }

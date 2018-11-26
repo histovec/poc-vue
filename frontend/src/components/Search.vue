@@ -15,7 +15,7 @@
   <div class="container">
     <div class="row">
       <!-- section start -->
-      <section class="dark-translucent-bg" style="background-image:url(assets/images/poignee_de_main.png);">
+      <section class="dark-translucent-bg" style="background-image:url(assets/images/poignee_de_main.jpg); background-position: 50% 50%">
         <div class="container">
           <div class="row justify-content-lg-center">
             <div class="col-lg-12">
@@ -67,12 +67,12 @@
             <!-- ================ -->
             <!-- Nav tabs -->
             <ul class="nav nav-tabs style-2" role="tablist">
-              <li :class="[{'in active' : type_personne === 'particulier'}]"><a class="clickable" @click="type_personne = 'particulier'"><i class="fa fa-user pr-10"></i>Particulier</a></li>
-              <li :class="[{'in active' : type_personne === 'pro'}]"><a class="clickable" @click="type_personne = 'pro'"><i class="fa fa-building-o pr-10"></i>Entreprise</a></li>
+              <li :class="[{'in active' : typePersonne === 'particulier'}]"><a class="clickable" @click="typePersonne = 'particulier'"><i class="fa fa-user pr-10"></i>Particulier</a></li>
+              <li :class="[{'in active' : typePersonne === 'pro'}]"><a class="clickable" @click="typePersonne = 'pro'"><i class="fa fa-building-o pr-10"></i>Entreprise</a></li>
             </ul>
             <!-- Tab panes -->
             <div class="tab-content">
-              <div class="tab-pane" id="h2tab1" :class="[{'in active' : type_personne === 'particulier'}]">
+              <div class="tab-pane" id="h2tab1" :class="[{'in active' : typePersonne === 'particulier'}]">
                 <div class="row">
                   <div class="col-md-12">
                     <span class="info_red txt-small-11" v-if="(status == 'failed') && (!checkFields)">* Veuillez renseignez les champs obligatoires</span>
@@ -88,14 +88,14 @@
                           </div>
                           <div class="col-md-4">
                             <div class="form-group has-feedback" :class="[{'has-error' : (prenom === '' && status !== 'init')}]">
-                              <label class="control-label">Prénom <span class="info_red" title="Ce champ est requis.">*</span></label>
+                              <label class="control-label">Prénom(s) <span class="info_red" title="Ce champ est requis.">*</span></label>
                               <input id="firstname" type="text" required="required" class="form-control" v-model="prenom" tabindex="2">
                               <i class="fa fa-user form-control-feedback"></i> </div>
                           </div>
                           <div class="col-md-4">
-                            <div class="form-group has-feedback" :class="[{'has-error' : (date_naissance === '' && status !== 'init')}]">
+                            <div class="form-group has-feedback" :class="[{'has-error' : ((!checkDateNaissance) && status !== 'init')}]">
                               <label class="control-label">Date de naissance <span class="info_red" title="Ce champ est requis.">*</span></label>
-                              <input type="text" required="required" class="form-control" placeholder="xx/xx/xxxx" v-model="date_naissance" tabindex="3">
+                              <input type="text" required="required" class="form-control" placeholder="xx/xx/xxxx" v-model="dateNaissance" tabindex="3">
                               <i class="fa fa-calendar form-control-feedback"></i> </div>
                           </div>
                         </div>
@@ -106,14 +106,14 @@
                       <form role="form">
                         <div class="row">
                           <div class="col-md-6">
-                            <div class="form-group has-feedback" :class="[{'has-error' : (plaque === '' && status !== 'init')}]">
+                            <div class="form-group has-feedback" :class="[{'has-error' : ((!checkPlaque) && status !== 'init')}]">
                               <label for="input" class="control-label">Plaque d'immatriculation <span class="info_red" title="Ce champ est requis.">*</span></label>
                               <input type="text" required="required" class="form-control" id="plaque" placeholder="AA-555-AA" v-model="plaque" tabindex="4">
                               <i class="fa fa-drivers-license-o form-control-feedback"></i> </div>
                           </div>
                           <div class="col-md-6">
                             <div class="form-group has-feedback plan position_left" :class="[{'has-error' : ((!checkFormule) && status !== 'init')}]">
-                              <label for="input" class="control-label">N° de formule <span class="info_red" title="Ce champ est requis.">*</span></label> <a @click="modal = true" class="clickable text-info btn-sm-link"><i class="fa fa-info-circle fa-lg"></i> </a>
+                              <label for="input" class="control-label">N° de formule <span class="info_red" title="Ce champ est requis.">*</span></label> <a @click="modal = true" class="clickable text-info btn-sm-link">Où le trouver <i class="fa fa-info-circle fa-lg"></i> </a>
                               <input type="text" id="formule" required="required" class="form-control" placeholder="2013BZ80335" v-model="formule" tabindex="5">
                               <i class="fa fa-pencil-square-o form-control-feedback"></i> </div>
                           </div>
@@ -127,23 +127,23 @@
                                     {'fa-spin fa-spinner' : (status === 'posting')},
                                     {'fa-exclamation-triangle' : (status === 'failed')}]"></i>Rechercher
                         </button>
-                        <!--
-                        <a href="#" class="btn btn-animated btn-default btn-sm pop" data-container="body" data-toggle="popover" data-placement="top" data-content="Le certificat de situation administrative (CSA) est un document délivré par le ministère de l'Intérieur contenant des éléments d'information sur la situation administrative d'un véhicule.<br>Le CSA détaillé fait apparaître l'ensemble des informations relatives à la situation du véhicule." data-original-title="CSA" title="CSA"> Imprimer CSA détaillé<i class="fa fa-print"></i> </a>--> </div>
-                      </div>
+                        <router-link class="btn btn-animated btn-default btn-sm" :to="{ name: 'faq'}"><i class="fa fa-question"></i>Besoin d'aide</router-link>
+                       </div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="tab-pane" id="h2tab2" :class="[{'in active' : type_personne === 'pro'}]">
+              <div class="tab-pane" id="h2tab2" :class="[{'in active' : typePersonne === 'pro'}]">
                 <div class="row">
-                  <div class="col-md-12"> <span class="info_red txt-small-11" v-if="status == 'failed'">* Veuillez renseignez les champs obligatoire</span>
+                  <div class="col-md-12"> <span class="info_red txt-small-11" v-if="status == 'failed'">* Veuillez renseigner les champs obligatoires</span>
                     <fieldset>
                       <legend><span class="color-default">Titulaire</span></legend>
                       <form role="form">
                         <div class="row">
                           <div class="col-md-6">
-                            <div class="form-group has-feedback" :class="[{'has-error' : (raison_sociale === '' && status !== 'init')}]">
+                            <div class="form-group has-feedback" :class="[{'has-error' : (raisonSociale === '' && status !== 'init')}]">
                               <label class="control-label">Raison sociale <span class="info_red" title="Ce champ est requis.">*</span></label>
-                              <input id="organization" name="raison_sociale" @paste="onPaste" type="text" required="required" class="form-control" v-bind:value="raison_sociale" v-on:input="raison_sociale = $event.target.value.replace(/\t.*/,'')" tabindex="1">
+                              <input id="organization" name="raisonSociale" @paste="onPaste" type="text" required="required" class="form-control" v-bind:value="raisonSociale" v-on:input="raisonSociale = $event.target.value.replace(/\t.*/,'')" tabindex="1">
                               <i class="fa fa-user form-control-feedback"></i> </div>
                           </div>
                           <div class="col-md-6">
@@ -160,14 +160,14 @@
                       <form role="form">
                         <div class="row">
                           <div class="col-md-6">
-                            <div class="form-group has-feedback" :class="[{'has-error' : (plaque === '' && status !== 'init')}]">
+                            <div class="form-group has-feedback" :class="[{'has-error' : ((!checkPlaque) && status !== 'init')}]">
                               <label for="input" class="control-label">Plaque d'immatriculation <span class="info_red" title="Ce champ est requis.">*</span></label>
                               <input type="text" required="required" class="form-control" id="plaque" placeholder="AA-555-AA" v-model="plaque" tabindex="3">
                               <i class="fa fa-drivers-license-o form-control-feedback"></i> </div>
                           </div>
                           <div class="col-md-6">
                             <div class="form-group has-feedback plan position_left" :class="[{'has-error' : (formule === '' && status !== 'init')}]">
-                              <label for="input" class="control-label">N° de formule <span class="info_red" title="Ce champ est requis.">*</span></label> <a @click="modal = true" class="clickable text-info btn-sm-link"><i class="fa fa-info-circle fa-lg"></i></a>
+                              <label for="input" class="control-label">N° de formule <span class="info_red" title="Ce champ est requis.">*</span></label> <a @click="modal = true" class="clickable text-info btn-sm-link">Où le trouver <i class="fa fa-info-circle fa-lg"></i></a>
                               <input type="text" id="formule" required="required" class="form-control" placeholder="2013BZ80335" v-model="formule" tabindex="4">
                               <i class="fa fa-pencil-square-o form-control-feedback"></i> </div>
                           </div>
@@ -180,8 +180,9 @@
                           <i class="fa" :class="[{'fa-search' : (status === 'init')},
                                     {'fa-spin fa-spinner' : (status === 'posting')},
                                     {'fa-exclamation-triangle' : (status === 'failed')}]"></i>Rechercher
-                        </button>                        <!--
-                        <a href="#" class="btn btn-animated btn-default btn-sm pop" data-container="body" data-toggle="popover" data-placement="top" data-content="Le certificat de situation administrative (CSA) est un document délivré par le ministère de l'Intérieur contenant des éléments d'information sur la situation administrative d'un véhicule.<br>Le CSA détaillé fait apparaître l'ensemble des informations relatives à la situation du véhicule." data-original-title="CSA" title="CSA"> Imprimer CSA détaillé<i class="fa fa-print"></i> </a>--> </div>
+                        </button>
+                        <router-link class="btn btn-animated btn-default btn-sm" :to="{ name: 'faq'}"><i class="fa fa-question"></i>Besoin d'aide</router-link>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -208,7 +209,7 @@
                   <button type="button" class="close" @click="modal = false"><span aria-hidden="true">&times;</span><span class="sr-only">Fermer</span></button>
                   <h6 class="modal-title">Information n° de formule</h6>
                 </div>
-                <div class="modal-body" style="height: 250px; overflow-y: auto;"> <img alt="Indication localisation numéro de formule : sous le numéro d'immatriculation ou dans la bande MRZ ou sur la première page de la carte grise" src="assets/images/n-formule.svg" class="img-responsive" style="margin: 0 auto;"> </div>
+                <div class="modal-body" style="height: 250px; overflow-y: auto;"> <img alt="Indication localisation numéro de formule : sous le numéro d'immatriculation ou dans la bande MRZ ou sur la première page de la carte grise" src="assets/images/n-formule.png" class="img-responsive" style="margin: 0 auto;"> </div>
                 <div class="modal-footer"> <a href="#" class="btn radius-30 btn btn-animated btn-default" @click="modal = false">Fermer <i class="fa fa-close"></i></a> </div>
               </div>
             </div>
@@ -232,15 +233,7 @@ export default {
   data () {
     return {
       modal: false,
-      active: false,
-      type_personne: 'particulier',
-      nom: '',
-      raison_sociale: '',
-      prenom: '',
-      date_naissance: '',
-      plaque: '',
-      siren: '',
-      formule: '',
+      active: true,
       status: 'init'
     }
   },
@@ -252,15 +245,87 @@ export default {
     }
   },
   computed: {
+    nom: {
+      get () {
+        return this.$store.state.nom
+      },
+      set (value) {
+        this.$store.commit('updateNom', value)
+      }
+    },
+    prenom: {
+      get () {
+        return this.$store.state.prenom
+      },
+      set (value) {
+        this.$store.commit('updatePrenom', value)
+      }
+    },
+    dateNaissance: {
+      get () {
+        return this.$store.state.dateNaissance
+      },
+      set (value) {
+        this.$store.commit('updateDateNaissance', value)
+      }
+    },
+    raisonSociale: {
+      get () {
+        return this.$store.state.raisonSociale
+      },
+      set (value) {
+        this.$store.commit('updateRaisonSociale', value)
+      }
+    },
+    siren: {
+      get () {
+        return this.$store.state.siren
+      },
+      set (value) {
+        this.$store.commit('updateSiren', value)
+      }
+    },
+    plaque: {
+      get () {
+        return this.$store.state.plaque
+      },
+      set (value) {
+        this.$store.commit('updatePlaque', value)
+      }
+    },
+    formule: {
+      get () {
+        return this.$store.state.formule
+      },
+      set (value) {
+        this.$store.commit('updateFormule', value)
+      }
+    },
+    typePersonne: {
+      get () {
+        return this.$store.state.typePersonne
+      },
+      set (value) {
+        this.$store.commit('updateTypePersonne', value)
+      }
+    },
+    checkDateNaissance () {
+      return (this.typePersonne === 'particulier') ? this.dateNaissance.match(/^[0-3][0-9](\/|-|\s+)?[0-1][0-9](\/|-|\s+)?[1-2][0-9]{3}$/) : true
+    },
+    checkPlaque () {
+      return this.plaque.match(/^[a-zA-Z]{2}(-|\s+)?[0-9]{3}(-|\s+)?[a-zA-Z]{2}$/)
+    },
     checkFormule () {
       return this.formule.match(/^\d{4}[a-zA-Z]{2}\d{5}$/)
     },
     checkFields () {
-      return ((this.nom && this.prenom && this.date_naissance) || (this.raison_sociale && this.siren)) && this.plaque && this.checkFormule
+      return ((this.nom && this.prenom) || (this.raisonSociale && this.siren)) && this.checkPlaque && this.checkDateNaissance && this.checkFormule
     },
     currentMonthNumber () {
       var date = new Date()
-      date = date.getFullYear() + '' + this.pad(date.getMonth() + 1, 2)
+      // patch temporaire pour la continuité du mois (réversibilité à faire mi-juillet)
+      // date = date.getFullYear() + '' + this.pad(date.getMonth() + 1, 2)
+      date = date.getFullYear() + '' + this.pad(date.getMonth(), 2)
       console.log(date)
       return date
     },
@@ -296,7 +361,7 @@ export default {
       return instance.getFullYear() + '' + currentWeekNumber
     },
     id () {
-      return this.hash(this.raison_sociale + this.siren + this.nom + this.prenom + this.date_naissance + this.plaque + this.formule)
+      return this.hash(this.raisonSociale + this.siren + this.nom + this.prenom + this.dateNaissance + this.plaque + this.formule)
     },
     code () {
       return this.hash(this.plaque + this.formule + this.currentMonthNumber)
@@ -312,12 +377,12 @@ export default {
         if (evt.target.name === 'nom') {
           this.nom = data[0]
           this.prenom = data[1]
-          this.date_naissance = data[2]
+          this.dateNaissance = data[2]
           this.plaque = data[3]
           this.formule = data[4]
         }
-        if (evt.target.name === 'raison_sociale') {
-          this.raison_sociale = data[0]
+        if (evt.target.name === 'raisonSociale') {
+          this.raisonSociale = data[0]
           this.siren = data[1]
           this.plaque = data[2]
           this.formule = data[3]
@@ -339,6 +404,12 @@ export default {
     onSubmit () {
       this.status = 'posting'
       if (this.checkFields) {
+        if (this.id !== this.$store.state.id) {
+          this.$store.commit('updateV', undefined)
+          this.$store.commit('updateKey', undefined)
+          this.$store.commit('updateCode', undefined)
+          this.$store.commit('updateId', undefined)
+        }
         this.$router.push({name: 'report', params: {id: this.id, key: this.key, code: this.code}})
       } else {
         this.status = 'failed'
@@ -346,6 +417,7 @@ export default {
     }
   },
   created () {
+    this.$http.put(this.apiUrl + 'log/' + this.$route.path.replace(/^\/\w+\//, '')).then(response => {}, () => {})
     let myShakeEvent = new Shake({
       threshold: 15,
       timeout: 1000
@@ -355,7 +427,7 @@ export default {
     if (!window.location.host.match(/(histovec.fr|.gouv.fr$)/)) {
       this.active = true
     }
-    this.type_personne = this.$route.params.t || 'particulier'
+    this.typePersonne = this.$store.state.typePersonne || this.$route.params.t || 'particulier'
   }
 }
 </script>

@@ -36,7 +36,9 @@ server {
     if ($request_method != GET) {
        return 403;
     }
+    add_header Access-Control-Allow-Origin '$http_origin';
     limit_req zone=api burst=10;
+    limit_req zone=server burst=20 nodelay;
     limit_req_status 429;
     rewrite "^/.*/id/([A-Za-z0-9_-]{43}=)$" /<dataset>/_search?q="$1"&size=1&terminate_after=1 break;
     proxy_pass http://<ES_HOST>:9200;
@@ -49,11 +51,34 @@ server {
     proxy_http_version 1.1;
   }
 
+  location ~ "^/<APP>/api/v0/log/exit" {
+    if ($request_method != POST) {
+       return 403;
+    }
+    limit_req zone=log burst=80 nodelay;
+    limit_req_status 429;
+    default_type application/json;
+    return 200 '{"status":"ok"}';
+  }
+
+
+  location ~ "^/<APP>/api/v0/log/.*" {
+    if ($request_method != PUT) {
+       return 403;
+    }
+    limit_req zone=log burst=80 nodelay;
+    limit_req_status 429;
+    default_type application/json;
+    return 200 '{"status":"ok"}';
+  }
+
   location ~ ^/<APP>/api/v0/id/.* {
     return 404;
   }
 
   location ~ (^/<APP>/api/v0/(contact|feedback)/) {
+    limit_req zone=api burst=3;
+    limit_req_status 429;
     if ($request_method != POST) {
        return 403;
     }
