@@ -19,6 +19,11 @@ services:
       - APP=${APP}
       - ES_HOST=${ES_HOST}
       - dataset=${dataset}
+      - API_USER_BURST
+      - API_GLOBAL_BURST
+      - API_GLOBAL_LIMIT_RATE
+      - API_USER_LIMIT_RATE
+      - API_USER_SCOPE
     volumes:
       - ${LOGS}/nginx:/var/log/nginx/
     ports:

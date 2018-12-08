@@ -38,7 +38,7 @@ until [ "$timeout" -le 0 -o "$test_result" -eq "0" ] ; do
 done
 if [ "$test_result" -gt "0" ] ; then
   ret=$test_result
-  echo "ERROR: cluster en erreur"
+  echo "ERROR: ${APP}-$container_name en erreur"
   exit $ret
 fi
 

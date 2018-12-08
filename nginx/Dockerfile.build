@@ -7,7 +7,7 @@ ENV ES_HOST ${ES_HOST}
 
 COPY run.sh /run.sh
 COPY nginx-run.template /etc/nginx/conf.d/default.template
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.template /etc/nginx/nginx.template
 COPY ${app_name}-${app_ver}-frontend-dist.tar.gz /
 
 RUN  [ -f "/run.sh" ] && chmod +x /run.sh

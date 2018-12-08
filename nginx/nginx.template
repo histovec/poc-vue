@@ -14,11 +14,11 @@ http {
     include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
 
-    limit_req_zone $http_x_forwarded_for zone=app:10m rate=5r/s;
-    limit_req_zone $http_x_forwarded_for zone=css:10m rate=10r/s;
-    limit_req_zone $http_x_forwarded_for zone=log:1m rate=5r/s;
-    limit_req_zone $http_x_forwarded_for zone=api:2m rate=10r/m;
-    limit_req_zone $server_addr zone=server:2m rate=5r/s;
+    limit_req_zone $<API_USER_SCOPE> zone=app:10m rate=5r/s;
+    limit_req_zone $<API_USER_SCOPE> zone=css:10m rate=10r/s;
+    limit_req_zone $<API_USER_SCOPE> zone=log:1m rate=5r/s;
+    limit_req_zone $<API_USER_SCOPE> zone=api:2m rate=<API_USER_LIMIT_RATE>;
+    limit_req_zone $server_addr zone=server:2m rate=<API_GLOBAL_LIMIT_RATE>;
 
     add_header X-Frame-Options SAMEORIGIN;
     add_header X-Content-Type-Options nosniff;

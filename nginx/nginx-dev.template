@@ -27,7 +27,7 @@ server {
     if ($request_method != GET) {
        return 403;
     }
-    rewrite "^/.*/id/([A-Za-z0-9_-]{43}=)$" /<dataset>/_search?q="$1"&size=1&terminate_after=1 break;
+    rewrite "^/.*/id/([A-Za-z0-9_-]{43}=)$" /<dataset>/_search?q="$1"&size=1&terminate_after=1&filter_path=hits.hits._source.v break;
     proxy_pass http://<ES_HOST>:9200;
     proxy_redirect off;
     proxy_hide_header Content-Type;
@@ -36,6 +36,9 @@ server {
     proxy_method POST;
     proxy_buffering off;
     proxy_http_version 1.1;
+    sub_filter_types '*';
+    sub_filter '{}' '';
+
   }
 
   location ~ "^/<APP>/api/v0/log/exit" {

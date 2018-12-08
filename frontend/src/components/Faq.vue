@@ -224,6 +224,23 @@
               </div>
             </div>
             <!-- fin question 11 -->
+            <!-- debut question 12 -->
+            <div id="l" class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title"> <a href="#l" @click="choose('l')" class="clickable" :class="[{'collapsed' : choice !== 'l' }]"> <i class="fa fa-file-text-o pr-10"></i>Quelle différence y a t'il entre la notion de propiétaire et titulaire ?</a> </h4>
+              </div>
+              <div class="panel-collapse collapse" :class="[{'in' : choice === 'l'}]">
+                <div class="panel-body">
+                  <UL>Propriétaire du véhicule et titulaire du certificat d'immatriculation sont deux notions différentes :</UL>
+                  <UL>Propriétaire : il s'agit du propriétaire du bien qu'est le véhicule et qui peut donc le vendre.</UL>
+                  <UL>Titulaire : il s'agit de la ou les personne(s) titulaire du droit à circuler avec le véhicule.</UL>
+                  <UL>Le propriétaire du véhicule et titulaire du certificat d'immatriculation sont le plus souvent la même personne, mais peuvent être différents.
+                      C'est pourquoi, Histovec distingue les opérations qui correspondent à la vente du véhicule ("cession/vente par un particulier" et "achat/reprise par un professionnel ") du changement de titulaire.</UL>
+                </div>
+              </div>
+            </div>
+            <!-- fin question 12 -->
+            <!-- debut question 20 -->
             <!-- debut question 20 -->
             <div id="z" class="panel panel-default">
               <div class="panel-heading">

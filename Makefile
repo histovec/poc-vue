@@ -19,6 +19,12 @@ export DC_PREFIX=${DC_DIR}/docker-compose
 export USE_TTY := $(shell test -t 1 && USE_TTY="-t")
 export ES_MEM=2048m
 export ES_HOST=elasticsearch
+export API_USER_LIMIT_RATE=1r/m
+export API_USER_BURST=3 nodelay
+export API_USER_SCOPE=http_x_forwarded_for
+export API_GLOBAL_LIMIT_RATE=5r/s
+export API_GLOBAL_BURST=20 nodelay
+
 
 # data prep (data not included in repo)
 export datadir=sample_data
@@ -81,7 +87,7 @@ ifeq ("$(wildcard /usr/bin/parallel)","")
 endif
 ifeq ("$(wildcard /usr/local/bin/docker-compose)","")
 	@echo installing docker-compose
-	@sudo curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+	@sudo curl -s -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 	@sudo chmod +x /usr/local/bin/docker-compose
 endif
 
@@ -94,7 +100,7 @@ index-purge: network elasticsearch
 	@echo
 
 index-create: network elasticsearch
-ifeq ("$(shell docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -XGET 'localhost:9200/${dataset}' | grep mapping | wc -l)","1")
+ifeq ("$(shell docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -s -XGET 'localhost:9200/${dataset}' | grep mapping | wc -l)","1")
 else
 	@echo
 	@docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -s -H "Content-Type: application/json" -XPUT localhost:9200/${dataset} -d '{"settings": ${settings}, "mappings": { "${dataset}": ${mapping}}}' | sed 's/{"acknowledged":true.*/${dataset} index created with mapping\n/'
@@ -107,29 +113,29 @@ else
 endif
 
 index-status: network elasticsearch
-	@docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -XGET localhost:9200/${dataset}?pretty
-	@docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -XGET localhost:9200/_cat/indices
+	@docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -s -XGET localhost:9200/${dataset}?pretty
+	@docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -s -XGET localhost:9200/_cat/indices
 
 index-load: index-create
 ifeq ("$(wildcard ${datasource})","")
 	@echo WARNING: missing data source ${datasource}
 endif
-ifeq ("$(shell docker exec -it ${APP}-elasticsearch curl -XGET 'localhost:9200/${dataset}' | grep mapping | wc -l)","1")
+ifeq ("$(shell docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -s -XGET 'localhost:9200/${dataset}' | grep mapping | wc -l)","1")
 	@# split -l ${ES_CHUNK} --filter=
 	@# parallel : parallel --no-notice --block-size 10M -N ${ES_CHUNK} -j${ES_JOBS} --pipe
 	@((zcat ${datasource}) || (gpg --quiet --batch --yes --passphrase "${PASSPHRASE}" -d ${datasource_crypt} | gunzip)) | awk 'BEGIN{n = 1;print "decrypting data - injection into elasticsearch will begin from line ${FROM}" > "/dev/stderr"; print ${header}}{if ((n == 1) || (n>=${FROM})) {print};if ((n%1000000)==0) {print "decrypted " n " lines" > "/dev/stderr"} n++}' |  perl -e 'while(<>){s/\"(.*?);(.*?)\"/\1,\2/g;print}' | perl -e '$$header=1;while(<>){ chomp;if ($$header) {@fields=split(/;/,$$_);$$header=0; }else {print "{\"index\": {\"_index\": \"'"${dataset}"'\", \"_type\": \"'"${dataset}"'\"}}\n";$$i=0;print "{".join(", ",map("\"@fields[$$i++]\": \"$$_\"",split(/;/,$$_)))."}\n";}}'| sed 's/\\//g;s/""/"/g;s/ ",/ "",/g;s/"{/{/g;s/}"/}/g;s/"\[/[/g;s/\]"/]/g' | parallel --no-notice --block-size 10M -N ${ES_CHUNK} -j${ES_JOBS} --pipe 'docker exec -i ${APP}-elasticsearch curl -s -H "Content-Type: application/json" localhost:9200/_bulk  --data-binary @-;echo ' | jq -c '.items[].index.result' | awk 'BEGIN{ok=${FROM}-1;ko=0}{if ($$1 == "\"created\"") { ok++ } else {ko++} if (((ok+ko)%${ES_VERBOSE} == 0)) {print strftime("%Y%m%d-%H:%M") " indexed:" ok " rejected:" ko}}'
-	@docker exec -it ${APP}-elasticsearch curl -XPUT localhost:9200/${dataset}/_settings -H 'content-type:application/json' -d'{"index.refresh_interval": "1s", "index.blocks.read_only": true}'
+	@docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -XPUT localhost:9200/${dataset}/_settings -H 'content-type:application/json' -d'{"index.refresh_interval": "1s", "index.blocks.read_only": true}'
 endif
 
 
 index-test:
-ifeq ("$(shell docker exec -it ${APP}-elasticsearch curl -XGET 'localhost:9200/${dataset}' | grep mapping | wc -l)","1")
+ifeq ("$(shell docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -s -XGET 'localhost:9200/${dataset}' | grep mapping | wc -l)","1")
 	@echo index test
 	@gpg --quiet --batch --yes --passphrase "${PASSPHRASE}" -d sample_data/siv.csv.gz.gpg | gunzip| awk -F ';' 'BEGIN{n=0}{n++;if (n>1){print $$1}}' | parallel --no-notice -j1 'curl -s -XGET localhost:${PORT}/histovec/api/v0/id/{} ' | jq -c '{"took": .took, "hit": .hits.total}'
 endif
 
 index-stress:
-ifeq ("$(shell docker exec -it ${APP}-elasticsearch curl -XGET 'localhost:9200/${dataset}' | grep mapping | wc -l)","1")
+ifeq ("$(shell docker exec -i ${USE_TTY} ${APP}-elasticsearch curl -s -XGET 'localhost:9200/${dataset}' | grep mapping | wc -l)","1")
 	@echo stress test
 	@gpg --quiet --batch --yes --passphrase "${PASSPHRASE}" -d sample_data/siv.csv.gz.gpg | gunzip| awk -F ';' 'BEGIN{n=0;print "reading file from line ${FROM}" > "/dev/stderr"}{n++;if (n>${FROM}){print $$1}}' | parallel --no-notice -j${stress} 'curl -s -XGET localhost:${PORT}/histovec/api/v0/id/{}' | jq -c -r '[.took, .hits.total] | @csv' | awk -F ',' 'BEGIN{n=0;t=0}{n++;t+=$$1;ok+=$$2;if ((n%${stress_verbose})==0) {total+=n; printf("%s with ${stress} parallel threads, total %d calls, %.0f%% hit, each response takes %.2fms\n",strftime("%Y%m%d-%H:%M"),total,ok/n*100,t/n);ok=0;t=0;n=0}}'
 endif

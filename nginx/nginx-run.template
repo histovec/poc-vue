@@ -37,8 +37,8 @@ server {
        return 403;
     }
     add_header Access-Control-Allow-Origin '$http_origin';
-    limit_req zone=api burst=10;
-    limit_req zone=server burst=20 nodelay;
+    limit_req zone=api burst=<API_USER_BURST>;
+    limit_req zone=server burst=<API_GLOBAL_BURST>;
     limit_req_status 429;
     rewrite "^/.*/id/([A-Za-z0-9_-]{43}=)$" /<dataset>/_search?q="$1"&size=1&terminate_after=1 break;
     proxy_pass http://<ES_HOST>:9200;
