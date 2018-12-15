@@ -32,7 +32,7 @@ server {
     alias /usr/share/nginx/html/static/assets;
   }
 
-  location ~ "^/<APP>/api/v0/id/([A-Za-z0-9_-]{43}=)$" {
+  location ~ "^/<APP>/api/v0/id/[a-f0-9-]{36}/([A-Za-z0-9_-]{43}=)$" {
     if ($request_method != GET) {
        return 403;
     }
@@ -40,7 +40,7 @@ server {
     limit_req zone=api burst=<API_USER_BURST>;
     limit_req zone=server burst=<API_GLOBAL_BURST>;
     limit_req_status 429;
-    rewrite "^/.*/id/([A-Za-z0-9_-]{43}=)$" /<dataset>/_search?q="$1"&size=1&terminate_after=1 break;
+    rewrite "^/.*/id/[a-f0-9-]{36}/([A-Za-z0-9_-]{43}=)$" /<dataset>/_search?q="$1"&size=1&terminate_after=1 break;
     proxy_pass http://<ES_HOST>:9200;
     proxy_redirect off;
     proxy_hide_header Content-Type;

@@ -56,13 +56,28 @@
     <section class="main-container" v-if="active">
       <div class="container">
         <div class="row">
-          <div class="col-md-12">
+          <div class="col-md-12" v-if="!fniMode">
             <div class="col-md-1"></div>
             <div class="col-md-10">
               <div class="alert alert-warning alert-icon text-center" role="alert"><i class="fa fa-exclamation-triangle"></i> Seuls les véhicules ayant une plaque au format <strong>AA-123-ZZ</strong> sont consultables pour l'instant </div>
             </div>
           </div>
-          <div class="col-md-12">
+          <div class="col-md-12" v-if="fniMode">
+            <div class="text-center" role="alert">
+              <h4 class="title p-b-25"> Veuillez sélectionner le format d'immatriculation de votre véhicule</h4>
+            </div>
+          </div>
+          <div class="col-xs-6 col-sm-6" v-if="fniMode">
+            <a class="clickable" @click="typeImmatriculation = 'siv'" title="Immatriculation après 2009">
+              <img class="img-responsive pull-right" :class="{'opacity-plaque': typeImmatriculation === 'fni' }" src="assets/images/nouvelle_plaque_immatriculation_fd_transp_txt.png" width="200" height="44">
+            </a>
+          </div>
+          <div class="col-xs-6 col-sm-6" v-if="fniMode">
+            <a class="clickable" @click="typeImmatriculation = 'fni'" title="Immatriculation avant 2009">
+              <img class="img-responsive pull-left" :class="{'opacity-plaque': typeImmatriculation === 'siv' }" src="assets/images/ancienne_plaque_immatriculation_fd_transp_txt.png" width="200" height="44">
+            </a>
+          </div>
+          <div class="col-md-12 col-xs-12 p-h-25" v-if="typeImmatriculation === 'siv' || typeImmatriculation === 'fni' || !fniMode">
             <!-- tabs start -->
             <!-- ================ -->
             <!-- Nav tabs -->
@@ -80,22 +95,24 @@
                       <legend><span class="color-default">Titulaire</span></legend>
                       <form role="form">
                         <div class="row">
-                          <div class="col-md-4">
+                          <div :class="{'col-md-4': typeImmatriculation === 'siv' || !fniMode, 'col-md-8' : typeImmatriculation === 'fni'}">
                             <div class="form-group has-feedback" :class="[{'has-error' : (nom === '' && status !== 'init')}]">
-                              <label class="control-label">Nom de naissance <span class="info_red" title="Ce champ est requis.">*</span></label>
+                              <label v-if="typeImmatriculation === 'siv' || !fniMode" class="control-label">Nom de naissance <span class="info_red" title="Ce champ est requis.">*</span></label>
+                              <label v-if="typeImmatriculation === 'fni'" class="control-label">Nom(s) et Prénom(s) <span class="info_red" title="Ce champ est requis.">*</span></label>
                               <input v-focus id="lastname" ref="nom" name="nom" required="required" @paste="onPaste" type="text" class="form-control" v-bind:value="nom" v-on:input="nom = $event.target.value.replace(/\t.*/,'')" tabindex="1">
                               <i class="fa fa-user form-control-feedback"></i> </div>
                           </div>
-                          <div class="col-md-4">
+                          <div class="col-md-4" v-if="typeImmatriculation === 'siv' || !fniMode">
                             <div class="form-group has-feedback" :class="[{'has-error' : (prenom === '' && status !== 'init')}]">
                               <label class="control-label">Prénom(s) <span class="info_red" title="Ce champ est requis.">*</span></label>
-                              <input id="firstname" type="text" required="required" class="form-control" v-model="prenom" tabindex="2">
+                              <input id="firstname" type="text" required="required" class="form-control" v-model="prenom" :tabindex="2">
                               <i class="fa fa-user form-control-feedback"></i> </div>
                           </div>
                           <div class="col-md-4">
                             <div class="form-group has-feedback" :class="[{'has-error' : ((!checkDateNaissance) && status !== 'init')}]">
                               <label class="control-label">Date de naissance <span class="info_red" title="Ce champ est requis.">*</span></label>
-                              <input type="text" required="required" class="form-control" placeholder="xx/xx/xxxx" v-model="dateNaissance" tabindex="3">
+                              <input v-if="typeImmatriculation === 'fni'" type="text" required="required" class="form-control" placeholder="xx/xx/xxxx" v-model="dateNaissance" tabindex="2">
+                              <input v-if="typeImmatriculation === 'siv' || !fniMode" type="text" required="required" class="form-control" placeholder="xx/xx/xxxx" v-model="dateNaissance" tabindex="3">
                               <i class="fa fa-calendar form-control-feedback"></i> </div>
                           </div>
                         </div>
@@ -108,14 +125,26 @@
                           <div class="col-md-6">
                             <div class="form-group has-feedback" :class="[{'has-error' : ((!checkPlaque) && status !== 'init')}]">
                               <label for="input" class="control-label">Plaque d'immatriculation <span class="info_red" title="Ce champ est requis.">*</span></label>
-                              <input type="text" required="required" class="form-control" id="plaque" placeholder="AA-555-AA" v-model="plaque" tabindex="4">
-                              <i class="fa fa-drivers-license-o form-control-feedback"></i> </div>
+                              <input v-if="typeImmatriculation === 'siv'" type="text" required="required" class="form-control" id="plaque" placeholder="AA-555-AA" v-model="plaque" tabindex="4">
+                              <input v-if="typeImmatriculation === 'fni' || !fniMode" type="text" required="required" class="form-control" id="plaque" placeholder="123 ABC 45" v-model="plaque" tabindex="4">
+                              <i class="fa fa-drivers-license-o form-control-feedback"></i>
+                            </div>
                           </div>
                           <div class="col-md-6">
-                            <div class="form-group has-feedback plan position_left" :class="[{'has-error' : ((!checkFormule) && status !== 'init')}]">
-                              <label for="input" class="control-label">N° de formule <span class="info_red" title="Ce champ est requis.">*</span></label> <a @click="modal = true" class="clickable text-info btn-sm-link">Où le trouver <i class="fa fa-info-circle fa-lg"></i> </a>
-                              <input type="text" id="formule" required="required" class="form-control" placeholder="2013BZ80335" v-model="formule" tabindex="5">
-                              <i class="fa fa-pencil-square-o form-control-feedback"></i> </div>
+                            <div v-shortkey="['ctrl', 'alt', 'f']" @shortkey="fniMode = !fniMode"></div>
+                            <div class="form-group has-feedback plan position_left" :class="[{'has-error' : ((!checkFormule && !checkDateCertificat) && status !== 'init')}]">
+                              <div v-if="typeImmatriculation === 'siv' || !fniMode">
+                                <label for="input" class="control-label">N° de formule <span class="info_red" title="Ce champ est requis.">*</span></label> <a @click="modal = true" class="clickable text-info btn-sm-link">Où le trouver <i class="fa fa-info-circle fa-lg"></i> </a>
+                                <input type="text" id="formule" required="required" class="form-control" placeholder="2013BZ80335" v-model="formule" tabindex="5">
+                                <i class="fa fa-pencil-square-o form-control-feedback"></i>
+                              </div>
+                              <div v-if="typeImmatriculation === 'fni'">
+                                <label for="input" class="control-label">Date du certificat d'immatriculation <span class="info_red" title="Ce champ est requis.">*</span></label> <a @click="modal = true" class="clickable text-info btn-sm-link">Où le trouver<i class="fa fa-info-circle fa-lg"></i> </a>
+                                <input type="text" id="dateCertificat" required="required" class="form-control" placeholder="xx/xx/xxxx" v-model="dateCertificat" tabindex="5">
+                                <!-- <input type="text" id="dateCertificat" required="required" class="form-control" placeholder="xx/xx/xxxx" v-model="dateCertificat" tabindex="5"> -->
+                                <i class="fa fa-calendar form-control-feedback"></i>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </form>
@@ -155,7 +184,7 @@
                         </div>
                       </form>
                     </fieldset>
-                    <fieldset>
+                    <fieldset v-if="typeImmatriculation === 'siv' || !fniMode">
                       <legend><span class="color-default">Carte grise</span></legend>
                       <form role="form">
                         <div class="row">
@@ -170,6 +199,25 @@
                               <label for="input" class="control-label">N° de formule <span class="info_red" title="Ce champ est requis.">*</span></label> <a @click="modal = true" class="clickable text-info btn-sm-link">Où le trouver <i class="fa fa-info-circle fa-lg"></i></a>
                               <input type="text" id="formule" required="required" class="form-control" placeholder="2013BZ80335" v-model="formule" tabindex="4">
                               <i class="fa fa-pencil-square-o form-control-feedback"></i> </div>
+                          </div>
+                        </div>
+                      </form>
+                    </fieldset>
+                    <fieldset v-if="typeImmatriculation === 'fni'">
+                      <legend><span class="color-default">Carte grise</span></legend>
+                      <form role="form">
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="form-group has-feedback" :class="[{'has-error' : ((!checkPlaque) && status !== 'init')}]">
+                              <label for="input" class="control-label">Plaque d'immatriculation <span class="info_red" title="Ce champ est requis.">*</span></label>
+                              <input type="text" required="required" class="form-control" id="plaque" placeholder="123 ABC 45" v-model="plaque" tabindex="6">
+                              <i class="fa fa-drivers-license-o form-control-feedback"></i> </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group has-feedback plan position_left" :class="[{'has-error' : ((!checkDateCertificat) && status !== 'init')}]">
+                              <label for="input" class="control-label">Date du certificat d'immatriculation <span class="info_red" title="Ce champ est requis.">*</span></label> <a @click="modal = true" class="clickable text-info btn-sm-link"><i class="fa fa-info-circle fa-lg"></i> </a>
+                              <input type="text" id="dateCertificat" required="required" class="form-control" placeholder="xx/xx/xxxx" v-model="dateCertificat" tabindex="7">
+                              <i class="fa fa-calendar form-control-feedback"></i> </div>
                           </div>
                         </div>
                       </form>
@@ -245,6 +293,14 @@ export default {
     }
   },
   computed: {
+    fniMode: {
+      get () {
+        return this.$store.state.fniMode
+      },
+      set (value) {
+        this.$store.commit('updateFniMode', value)
+      }
+    },
     nom: {
       get () {
         return this.$store.state.nom
@@ -309,17 +365,36 @@ export default {
         this.$store.commit('updateTypePersonne', value)
       }
     },
+    typeImmatriculation: {
+      get () {
+        return this.$store.state.typeImmatriculation
+      },
+      set (value) {
+        this.$store.commit('updateTypeImmatriculation', value)
+      }
+    },
+    dateCertificat: {
+      get () {
+        return this.$store.state.dateCertificat
+      },
+      set (value) {
+        this.$store.commit('updateDateCertificat', value)
+      }
+    },
     checkDateNaissance () {
-      return (this.typePersonne === 'particulier') ? this.dateNaissance.match(/^[0-3][0-9](\/|-|\s+)?[0-1][0-9](\/|-|\s+)?[1-2][0-9]{3}$/) : true
+      return this.dateNaissance.match(/^[0-3][0-9](\/|-|\s+)?[0-1][0-9](\/|-|\s+)?[1-2][0-9]{3}$/)
+    },
+    checkDateCertificat () {
+      return this.dateCertificat.match(/^[0-3][0-9](\/|-|\s+)?[0-1][0-9](\/|-|\s+)?[1-2][0-9]{3}$/)
     },
     checkPlaque () {
-      return this.plaque.match(/^[a-zA-Z]{2}(-|\s+)?[0-9]{3}(-|\s+)?[a-zA-Z]{2}$/)
+      return (this.typeImmatriculation === 'fni') ? this.plaque.match(/^\s*[0-9]{2,4}(-|\s+)?[a-zA-Z]{2,3}(-|\s+)?[0-9]{2,3}\s*$/) : this.plaque.match(/^[a-zA-Z]{2}(-|\s+)?[0-9]{3}(-|\s+)?[a-zA-Z]{2}$/)
     },
     checkFormule () {
       return this.formule.match(/^\d{4}[a-zA-Z]{2}\d{5}$/)
     },
     checkFields () {
-      return ((this.nom && this.prenom) || (this.raisonSociale && this.siren)) && this.checkPlaque && this.checkDateNaissance && this.checkFormule
+      return ((this.nom && (this.prenom || this.typeImmatriculation === 'fni') && this.checkDateNaissance) || (this.raisonSociale && this.siren)) && this.checkPlaque && (this.checkFormule || this.checkDateCertificat)
     },
     currentMonthNumber () {
       var date = new Date()
@@ -361,13 +436,13 @@ export default {
       return instance.getFullYear() + '' + currentWeekNumber
     },
     id () {
-      return this.hash(this.raisonSociale + this.siren + this.nom + this.prenom + this.dateNaissance + this.plaque + this.formule)
+      return this.hash(this.raisonSociale + this.siren + this.nom + this.prenom + this.dateNaissance + this.plaque + this.formule + this.dateCertificat)
     },
     code () {
-      return this.hash(this.plaque + this.formule + this.currentMonthNumber)
+      return this.hash(this.plaque + this.formule + this.dateCertificat + this.currentMonthNumber)
     },
     key () {
-      return this.hash(this.plaque + this.formule)
+      return this.hash(this.plaque + this.formule + this.dateCertificat)
     }
   },
   methods: {
@@ -375,17 +450,30 @@ export default {
       let data = evt.clipboardData.getData('Text').replace(/\s*$/, '').split(/\t+/)
       if (data.length > 1) {
         if (evt.target.name === 'nom') {
-          this.nom = data[0]
-          this.prenom = data[1]
-          this.dateNaissance = data[2]
-          this.plaque = data[3]
-          this.formule = data[4]
+          if (this.typeImmatriculation === 'siv' || !this.fniMode) {
+            this.nom = data[0]
+            this.prenom = data[1]
+            this.dateNaissance = data[2]
+            this.plaque = data[3]
+            this.formule = data[4]
+          }
+          if (this.typeImmatriculation === 'fni') {
+            this.nom = data[0]
+            this.dateNaissance = data[1]
+            this.plaque = data[2]
+            this.dateCertificat = data[3]
+          }
         }
         if (evt.target.name === 'raisonSociale') {
           this.raisonSociale = data[0]
           this.siren = data[1]
           this.plaque = data[2]
-          this.formule = data[3]
+          if (this.typeImmatriculation === 'siv' || !this.fniMode) {
+            this.formule = data[3]
+          }
+          if (this.typeImmatriculation === 'fni') {
+            this.dateCertificat = data[3]
+          }
         }
       }
     },
@@ -417,7 +505,7 @@ export default {
     }
   },
   created () {
-    this.$http.put(this.apiUrl + 'log/' + this.$route.path.replace(/^\/\w+\//, '')).then(response => {}, () => {})
+    this.$http.put(this.apiUrl + 'log/' + this.$cookie.get('userId') + '/' + this.$route.path.replace(/^\/\w+\//, '')).then(response => {}, () => {})
     let myShakeEvent = new Shake({
       threshold: 15,
       timeout: 1000

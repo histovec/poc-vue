@@ -23,11 +23,15 @@ server {
     alias /usr/share/nginx/html/assets;
   }
 
-  location ~ "^/<APP>/api/v0/id/([A-Za-z0-9_-]{43}=)$" {
+  location ~ "^/<APP>/api/v0/id/[a-f0-9-]{36}/([A-Za-z0-9_-]{43}=)$" {
+    #valid_referers histovec.interieur.gouv.fr localhost beta.datalab.mi histovec.fr;
+    #if ($invalid_referer) {
+    #    return 403;
+    #man}
     if ($request_method != GET) {
        return 403;
     }
-    rewrite "^/.*/id/([A-Za-z0-9_-]{43}=)$" /<dataset>/_search?q="$1"&size=1&terminate_after=1&filter_path=hits.hits._source.v break;
+    rewrite "^/.*/id/.*/([A-Za-z0-9_-]{43}=)$" /<dataset>/_search?q="$1"&size=1&terminate_after=1&filter_path=hits.hits._source.v break;
     proxy_pass http://<ES_HOST>:9200;
     proxy_redirect off;
     proxy_hide_header Content-Type;

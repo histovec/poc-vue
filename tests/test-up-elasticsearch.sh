@@ -83,9 +83,9 @@ if [ "$test_result" -gt "0" ] ; then
 fi
 echo "$test_output"
 
-echo "# elasticsearch _cat/indices == 3"
+echo "# elasticsearch _cat/indices >= 3"
 # test nb indice == 3
-[ "$(echo "$test_output" | wc -l)" -eq 3 ]
+[ "$(echo "$test_output" | wc -l)" -ge 3 ]
 test_result=$?
 
 if [ "$test_result" -gt "0" ] ; then

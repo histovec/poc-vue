@@ -69,7 +69,7 @@
 <script>
 export default {
   created () {
-    this.$http.put(this.apiUrl + 'log/404/' + this.$route.path.replace(/^\/\w+\//, '')).then(response => {}, () => {})
+    this.$http.put(this.apiUrl + 'log/404/' + this.$cookie.get('userId') + '/' + this.$route.path.replace(/^\/\w+\//, '')).then(response => {}, () => {})
   }
 }
 </script>

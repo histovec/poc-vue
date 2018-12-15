@@ -11,11 +11,11 @@ services:
     volumes:
       - ${APP_PATH}/nginx/nginx-dev.template:/etc/nginx/conf.d/default.template
       - ${APP_PATH}/nginx/tor-ip.conf:/etc/nginx/tor-ip.conf
-      - ${APP_PATH}/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ${APP_PATH}/nginx/nginx.template:/etc/nginx/nginx.template
       - ${FRONTEND}/static:/usr/share/nginx/html
     ports:
       - ${PORT}:80
-    command: /bin/bash -c '(sed "s/<APP>/${APP}/g;s/<dataset>/${dataset}/g;s/<ES_HOST>/${ES_HOST}/g;" < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf) && nginx -g "daemon off;"'
+    command: /bin/bash -c '(sed "s/<APP>/${APP}/g;s/<dataset>/${dataset}/g;s/<ES_HOST>/${ES_HOST}/g;s|<API_USER_BURST>|${API_USER_BURST}|g;s|<API_GLOBAL_BURST>|${API_GLOBAL_BURST}|g;" < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf) && (sed "s|<API_GLOBAL_LIMIT_RATE>|${API_GLOBAL_LIMIT_RATE}|;s|<API_USER_LIMIT_RATE>|${API_USER_LIMIT_RATE}|g;s|<API_USER_SCOPE>|${API_USER_SCOPE}|g" < /etc/nginx/nginx.template > /etc/nginx/nginx.conf) && nginx -g "daemon off;"'
     restart: always
 
   frontend-dev:
