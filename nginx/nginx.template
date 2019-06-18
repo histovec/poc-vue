@@ -14,11 +14,14 @@ http {
     include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
 
+    server_tokens off;
+
     limit_req_zone $<API_USER_SCOPE> zone=app:10m rate=5r/s;
     limit_req_zone $<API_USER_SCOPE> zone=css:10m rate=10r/s;
     limit_req_zone $<API_USER_SCOPE> zone=log:1m rate=5r/s;
     limit_req_zone $<API_USER_SCOPE> zone=api:2m rate=<API_USER_LIMIT_RATE>;
     limit_req_zone $server_addr zone=server:2m rate=<API_GLOBAL_LIMIT_RATE>;
+    limit_req_zone $server_addr zone=write:2m rate=<API_WRITE_LIMIT_RATE>;
 
     add_header X-Frame-Options SAMEORIGIN;
     add_header X-Content-Type-Options nosniff;
@@ -27,11 +30,43 @@ http {
     add_header Referrer-Policy "same-origin";
     add_header Feature-Policy "geolocation none;midi none;notifications none;push none;sync-xhr none;microphone none;camera none;magnetometer none;gyroscope self;speaker self;vibrate none;fullscreen self;payment none;";
 
+    client_max_body_size 2k;
+
+    # log text
     log_format main '$http_x_forwarded_for - $remote_addr - $remote_user [$time_local] '
     	'"$request" $status $body_bytes_sent '
     	'"$http_referer" "$http_user_agent" '
     	'$request_time $upstream_response_time $pipe';
 
+    # log json: fix default value for upstream_response_time
+    map $upstream_response_time $upstream_response_time_val {
+      default $upstream_response_time;
+      "" null;
+    }
+
+    # log json format ( { "nginx": { "key": "value"} } )
+    log_format main_json escape=json '{ "nginx": {'
+      '"http_x_forwarded_for":"$http_x_forwarded_for",'
+      '"http_referer":"$http_referer",'
+      '"http_user_agent":"$http_user_agent",'
+      '"remote_addr":"$remote_addr",'
+      '"remote_user":"$remote_user",'
+      '"time_local":"$time_local",'
+      '"request":"$request",'
+      '"request_time":$request_time,'
+      '"request_method":"$request_method",'
+      '"request_uri":"$request_uri",'
+      '"uri":"$uri",'
+      '"status":$status,'
+      '"body_bytes_sent":$body_bytes_sent,'
+      '"upstream_addr":"$upstream_addr",'
+      '"upstream_status":"$upstream_status",'
+      '"upstream_response_time":$upstream_response_time_val,'
+      '"pipe":"$pipe"'
+      '}}';
+
+# log json
+#    access_log  /var/log/nginx/access.log  main_json;
     access_log  /var/log/nginx/access.log  main;
 
     sendfile        on;

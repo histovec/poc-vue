@@ -1,0 +1,25 @@
+version: '3.4'
+
+services:
+  utac:
+    image: utac-fake
+    build:
+      context: utac-fake
+      dockerfile: Dockerfile
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+        npm_registry: ${NPM_REGISTRY}
+        MIRROR_DEBIAN: ${MIRROR_DEBIAN}
+    environment:
+      - UTAC_PORT=${UTAC_PORT}
+      - UTAC_API=${UTAC_API}
+      - UTAC_TIMEOUT=${UTAC_TIMEOUT}
+    container_name: ${APP}-utac-fake
+    restart: always
+
+networks:
+  default:
+    external:
+      name: ${APP}

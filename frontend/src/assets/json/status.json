@@ -1,0 +1,59 @@
+{
+  "default": {
+    "msg": "Statut inconnu",
+    "class": "alert alert-icon alert-danger",
+    "icon": "fa fa-warning",
+    "ref": {
+      "msg": "Besoin d'aide",
+      "route": "faq",
+      "hash": "#je-ne-trouve-pas-mon-vehicule",
+      "icon": "fa fa-question-circle fa-lg"
+    }
+  },
+  "wait": {
+    "msg": "Recherche en cours",
+    "class": "alert alert-info text-center",
+    "icon": "fa fa-spinner fa-spin",
+    "ref": false
+  },
+  "notFound": "Désolé, nous n'avons pas trouvé de résultat pour cette recherche.",
+  "invalid": "Les données entrées sont invalides. Veuillez essayer à nouveau.",
+  "cancelled": "Le certificat demandé a été annulé. Une procédure de destruction du véhicule est en cours.",
+  "unavailable": "Le service Histovec n'est pas disponible pour le moment. Veuillez réessayer ultérieurement.",
+  "tooManyRequests": "Trop de requêtes pour le moment. Veuillez attendre quelques instants puis réessayez.",
+  "decryptError": "Problème dans l'ouverture du rapport sécurisé - sollicitez nous.",
+  "decryptErrorBuyer": {
+    "msg": "Le rapport a été trouvé, mais la clé pour l'ouvrir est invalide : veuillez redemander le lien ou le QR-code à votre vendeur.",
+    "class": "alert alert-icon alert-danger",
+    "icon": "fa fa-warning",
+    "ref": {
+      "msg": "Besoin d'aide",
+      "route": "faq",
+      "hash": "#acheteur-le-lien-fourni-ne-fonctionne-pas",
+      "icon": "fa fa-question-circle fa-lg"
+    }
+  },
+  "invalidBuyer": {
+    "msg": "Le lien fourni n'est pas valide: veuillez redemander le lien ou le QR-code à votre vendeur.",
+    "class": "alert alert-icon alert-danger",
+    "icon": "fa fa-warning",
+    "ref": {
+      "msg": "Besoin d'aide",
+      "route": "faq",
+      "hash": "#acheteur-le-lien-fourni-ne-fonctionne-pas",
+      "icon": "fa fa-question-circle fa-lg"
+    }
+  },
+  "notFoundBuyer": {
+    "msg": "Le rapport ne semble pas ou plus disponible: veuillez redemander le lien ou le QR-code à votre vendeur.",
+    "class": "alert alert-icon alert-danger",
+    "icon": "fa fa-warning",
+    "ref": {
+      "msg": "Besoin d'aide",
+      "route": "faq",
+      "hash": "#acheteur-le-lien-fourni-ne-fonctionne-pas",
+      "icon": "fa fa-question-circle fa-lg"
+    }
+  },
+  "error": "Erreur inconnue - sollicitez nous."
+}

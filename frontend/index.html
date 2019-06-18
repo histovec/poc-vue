@@ -2,55 +2,93 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<title>Site HistoVec</title>
+<title>HistoVec - jouez la transparence en partageant l'historique du véhicule</title>
 <!-- Mobile Meta -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Favicon -->
+<meta name="description" content="Un service public gratuit pour les propriétaires et les acheteurs de véhicules d'occasion, basé sur les données officielles du ministère de l'Intérieur.">
 <link rel="shortcut icon" href="assets/images/mi.ico" />
-<!-- debut web fonts -->
-<!-- <link href="http://fonts.googleapis.com/css?family=Raleway:700,400,300" rel="stylesheet" type="text/css"> -->
-<!-- fin web fonts -->
-<!-- debut feuilles de style -->
-<!-- <link href="assets/bootstrap-3.3.7-dist/css/bootstrap.css" rel="stylesheet"> -->
-<!-- <link href="assets/Font-Awesome-master/css/font-awesome.min.css" rel="stylesheet"> -->
-<!-- <link href="assets/css/settings.css" rel="stylesheet"> -->
-<!-- <link href="assets/css/_style.css" rel="stylesheet" > -->
-<!-- <link href="assets/css/bleu_vert.css" rel="stylesheet"> -->
-<!-- fin feuilles de style -->
+
 </head>
+<noscript>
+  <h1>JOUEZ LA TRANSPARENCE</h1>
+  En partageant l'historique du véhicule
+
+  Rassurez vos acheteurs potentiels.
+
+  Achetez en confiance : demandez au vendeur le rapport.
+
+  <h1>COMMENT ÇA MARCHE</h1>
+  <h2>1 - Identifiez-vous</h2>
+  Le vendeur renseigne son identité et les informations d’identification du véhicule.
+
+  <h2>2 - Générez le rapport...</h2>
+  Le vendeur consulte son rapport HistoVec et partage le lien à l'acheteur.
+
+  <h2>3 - Partagez-le !</h2>
+  L’acheteur consulte le rapport HistoVec sur le site officiel de l’administration.
+
+  <h1>CONSULTER UN EXEMPLE DE RAPPORT...</h1>
+  type véhicule, puissance fiscale, propriétaire actuel, depuis quelle année, nombre de propriétaires
+
+  <h1>NOS GARANTIES !</h1>
+  <h2>Officiel</h2>
+  Données officielles du Ministère de l’Intérieur issues du SIV
+
+  <h2>Confidentiel</h2>
+  Seul le propriétaire peut partager ses informations avec un acheteur potentiel.
+
+  <h2>Gratuit</h2>
+  Un service public gratuit pour les propriétaires et les acheteurs.
+
+  <h1>L’ADMINISTRATION AGIT POUR LA SÉCURITÉ ROUTIÈRE</h1>
+  Ce site est mis en oeuvre par le ministère de l’intérieur dans le cadre de la mesure 16 décidée par le Gouvernement en janvier 2018 afin de mieux protéger les acheteurs de véhicules d’occasion (cf. dossier de presse)
+
+  <h1>Acheteur</h1>
+  Vous souhaitez acquérir un véhicule d’occasion, vous avez fait une sélection parmi des annonces, demandez au vendeur de partager l'historique de son véhicule.
+
+  HistoVec permet au vendeur de partager avec un acheteur intéressé l’historique des faits marquants du véhicule enregistrés dans le fichier national du SIV (Système d’Immatriculation des Véhicules), notamment :
+  <ul>
+    <li>- date de mise en circulation</li>
+    <li>- changements de propriétaire</li>
+    <li>- sinistres à réparation contrôlée</li>
+    <li>- situation administrative (gage, opposition, vol, …) etc.</li>
+  </ul>
+  En acheteur éclairé, vous pourrez prendre votre décision en toute quiétude.
+  Vous pouvez envoyer un courriel au vendeur en utilisant le bouton ci-dessous. Il s'agit d'un modèle qui peut vous aider, mais vous pouvez utiliser d'autres moyens pour lui faire part de votre demande.
+
+Cette option ne fonctionne que si votre navigateur est configuré pour ouvrir les liens couriel.
+
+</noscript>
+
+<script>
+  setTimeout(function(){
+    var tmp = document.getElementById("infoNotWorking")
+    if (tmp) {
+      tmp.style.display = "block";
+    }
+  }, 10000);
+</script>
+<style>
+  #infoNotWorking {
+    text-align: center;
+    font-size: 1em;
+    display: none;
+  }
+</style>
+
 <body class="front-page boxed pattern-2">
+
+
 <!-- scrollToTop -->
 <div class="scrollToTop circle"><i class="fa fa-angle-up"></i></div>
 <!-- page wrapper start -->
 <div class="page-wrapper">
-  <div id="root"></div>
-  <!-- section end -->
+  <div id="root">
+    <div id="infoNotWorking">
+      Si vous voyez ce message, c'est que le chargement d'HistoVec n'est pas terminé ou bien que votre navigateur est incompatible.
+      <br>
+      Les navigateurs supportés sont : Edge >= 15, Chrome >= 49, Firefox >= 51, Safari >=11, Opera >= 37
+    </div>
+  </div>
 </div>
-
-<!-- page-wrapper end -->
-<!-- debut jQuery -->
-<!-- <script type="text/javascript" src="assets/js/jquery.js"></script> -->
-<!-- <script type="text/javascript" src="assets/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script> -->
-<!-- <script>
-$(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
-</script>
-<script>
-$(".pop").popover({ trigger: "manual" , html: true, animation:false})
-    .on("mouseenter", function () {
-        var _this = this;
-        $(this).popover("show");
-        $(".popover").on("mouseleave", function () {
-            $(_this).popover('hide');
-        });
-    }).on("mouseleave", function () {
-        var _this = this;
-        setTimeout(function () {
-            if (!$(".popover:hover").length) {
-                $(_this).popover("hide");
-            }
-        }, 500);
-})
-</script> -->
 </html>

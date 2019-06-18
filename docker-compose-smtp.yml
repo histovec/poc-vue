@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  smtp:
+    image: djfarrelly/maildev
+    container_name: ${APP}-smtp-fake
+    ports:
+      - 1080:80
+    restart: always
+
+networks:
+  default:
+    external:
+      name: ${APP}

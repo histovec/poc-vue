@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+  artillery:
+    image: ${APP}-artillery
+    build:
+      context: ${PERF}
+      dockerfile: Dockerfile
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+        npm_registry: ${NPM_REGISTRY}
+        MIRROR_DEBIAN: ${MIRROR_DEBIAN}
+    environment:
+      - PERF_MAX_USERS=${PERF_MAX_USERS}
+      - PERF_WARMUP=${PERF_WARMUP}
+      - PERF_SUSTAINED=${PERF_SUSTAINED}
+    container_name: ${APP}-artillery
+    volumes:
+      - ${PERF_IDS}.random:/artillery/ids.csv
+      - ${PERF_SCENARIO}:/artillery/scenario.yml
+      - ${PERF_REPORTS}:/artillery/reports/
+
+networks:
+  default:
+    external:
+      name: ${APP}

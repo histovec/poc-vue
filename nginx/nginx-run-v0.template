@@ -1,0 +1,106 @@
+server {
+  listen 80 default_server;
+
+  location / {
+    try_files $uri @rew;
+  }
+
+  location /google6d56c7b24593249c.html {
+     return 200 "google-site-verification: google6d56c7b24593249c.html";
+  }
+
+  location /robots.txt {
+    return 200 "User-agent: *\nDisallow: /<APP>/api/\nAllow: /";
+  }
+
+
+  location @rew {
+    return 302 $scheme://$http_host/<APP>/;
+  }
+
+  location /<APP> {
+    limit_req zone=app burst=10 nodelay;
+    limit_req_status 429;
+    alias /usr/share/nginx/html/<APP>;
+    try_files $uri $uri/ @rewrites;
+  }
+
+  location @rewrites {
+    rewrite ^(.+)$ /<APP>/index.html last;
+  }
+
+  location /<APP>/static {
+    limit_req zone=app burst=10 nodelay;
+    limit_req_status 429;
+    alias /usr/share/nginx/html/static;
+  }
+
+  location /<APP>/assets {
+    limit_req zone=css burst=80 nodelay;
+    limit_req_status 429;
+    alias /usr/share/nginx/html/static/assets;
+  }
+
+  location ~ "^/<APP>/api/v0/id/[a-f0-9-]{36}/([A-Za-z0-9_-]{43}=)$" {
+    if ($request_method != GET) {
+       return 405;
+    }
+    add_header Access-Control-Allow-Origin '$http_origin';
+    limit_req zone=api burst=<API_USER_BURST>;
+    limit_req zone=server burst=<API_GLOBAL_BURST>;
+    limit_req_status 429;
+    rewrite "^/.*/id/[a-f0-9-]{36}/([A-Za-z0-9_-]{43}=)$" /<ES_INDEX>/_search?q="$1"&size=1&terminate_after=1&filter_path=hits.hits._source.v break;
+    proxy_pass http://<ES_HOST>:9200;
+    proxy_redirect off;
+    proxy_hide_header Content-Type;
+    proxy_set_body '{"_source": "v"}';
+    proxy_set_header content-type "application/json";
+    proxy_method POST;
+    proxy_buffering off;
+    proxy_http_version 1.1;
+  }
+
+  location ~ "^/<APP>/api/v0/log/exit" {
+    if ($request_method != POST) {
+       return 405;
+    }
+    limit_req zone=log burst=80 nodelay;
+    limit_req_status 429;
+    default_type application/json;
+    return 200 '{"status":"ok"}';
+  }
+
+
+  location ~ "^/<APP>/api/v0/log/.*" {
+    if ($request_method != PUT) {
+       return 405;
+    }
+    limit_req zone=log burst=80 nodelay;
+    limit_req_status 429;
+    default_type application/json;
+    return 200 '{"status":"ok"}';
+  }
+
+  location ~ ^/<APP>/api/v0/id/.* {
+    return 400;
+  }
+
+  location ~ (^/<APP>/api/v0/feedback/) {
+    limit_req zone=api burst=<API_USER_BURST>;
+    limit_req zone=write burst=<API_WRITE_BURST>;
+
+    limit_req_status 429;
+    if ($request_method != POST) {
+       return 405;
+    }
+    rewrite "^/.*/(feedback)/$" /$1/_doc break;
+    proxy_pass http://<ES_HOST>:9200;
+    proxy_redirect off;
+    proxy_hide_header Content-Type;
+    proxy_set_header content-type "application/json";
+    proxy_buffering off;
+    proxy_http_version 1.1;
+  }
+
+
+}

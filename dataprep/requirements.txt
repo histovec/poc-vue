@@ -1,0 +1,5 @@
+elasticsearch>=6.0.0,<7.0.0
+numpy
+pandas
+pycrypto
+python-swiftclient

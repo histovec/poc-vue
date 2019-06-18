@@ -8,11 +8,11 @@ basename=$(basename $0)
 echo "# $basename ${APP} ${APP_VERSION}"
 
 ret=0
-container_name=nginx
+container_name=nginx-production
 
 echo "# Wait ${APP}-$container_name up"
 set +e
-timeout=120;
+timeout=20;
 test_result=1
 dirname=$(dirname $0)
 docker cp $dirname/fake-curl.sh ${APP}-$container_name:/tmp/

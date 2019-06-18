@@ -1,0 +1,29 @@
+{
+  "mode": {
+    "rating": "rating",
+    "contact": "contact"
+  },
+  "title": {
+    "rating": "Votre évaluation",
+    "contact": "Contact"
+  },
+  "route": {
+    "rating": "feedback",
+    "contact": "contact"
+  },
+  "subject": {
+    "default": "Choisissez",
+    "error": "Signaler une erreur",
+    "content": "Signaler un problème avec les données de mon véhicule",
+    "holderNotFound": "Je ne trouve pas mon véhicule",
+    "buyerNotFound": "Signaler une erreur de lien invalide",
+    "other": "Autre problème",
+    "contact": "Contact"
+  },
+  "error": {
+    "subject": "Veuillez choisir un objet",
+    "mail": "L'adresse email n'est pas valide",
+    "note": "L'évaluation est obligatoire",
+    "api": "Service indisponible, votre retour n'a pas pu être pris en compte"
+  }
+}

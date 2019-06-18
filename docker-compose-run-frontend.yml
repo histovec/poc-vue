@@ -1,22 +1,40 @@
-version: '2'
+version: '3.4'
+
+services:
+  nginx:
+    image: ${APP}-nginx-${EXEC_ENV}:${APP_VERSION}
+    build:
+      context: ${NGINX}
+      target: ${EXEC_ENV}
+      dockerfile: Dockerfile
+      args:
+        app_name: ${APP}
+        app_ver: ${APP_VERSION}
+        NGINX_SERVER_TEMPLATE: ${NGINX_SERVER_TEMPLATE}
+    container_name: ${APP}-nginx-${EXEC_ENV}
+    environment:
+      - APP
+      - ES_HOST
+      - ES_PORT
+      - ES_INDEX
+      - BACKEND_HOST
+      - BACKEND_PORT
+      - FRONTEND_DEV_HOST
+      - FRONTEND_DEV_PORT
+      - API_GLOBAL_BURST
+      - API_GLOBAL_LIMIT_RATE
+      - API_USER_LIMIT_RATE
+      - API_USER_SCOPE
+      - API_USER_BURST
+      - API_WRITE_LIMIT_RATE
+      - API_WRITE_BURST
+    volumes:
+      - ${LOGS}/nginx:/var/log/nginx/
+    ports:
+      - ${PORT}:80
+    restart: always
 
 networks:
   default:
     external:
       name: ${APP}
-
-services:
-  nginx:
-    image: nginx
-    container_name: ${APP}-nginx
-    volumes:
-      - ${APP_PATH}/nginx/nginx-run.template:/etc/nginx/conf.d/default.template
-      - ${APP_PATH}/nginx/tor-ip.conf:/etc/nginx/tor-ip.conf
-      - ${APP_PATH}/nginx/nginx.template:/etc/nginx/nginx.template
-      - ${FRONTEND}/dist:/usr/share/nginx/html
-      - ${LOGS}/nginx:/var/log/nginx/
-    ports:
-      - ${PORT}:80
-    restart: always
-    command: /bin/bash -c '(sed "s/<APP>/${APP}/g;s/<dataset>/${dataset}/g;s/<ES_HOST>/${ES_HOST}/g;s|<API_USER_BURST>|${API_USER_BURST}|g;s|<API_GLOBAL_BURST>|${API_GLOBAL_BURST}|g;" < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf) && (sed "s|<API_GLOBAL_LIMIT_RATE>|${API_GLOBAL_LIMIT_RATE}|;s|<API_USER_LIMIT_RATE>|${API_USER_LIMIT_RATE}|g;s|<API_USER_SCOPE>|${API_USER_SCOPE}|g" < /etc/nginx/nginx.template > /etc/nginx/nginx.conf) && nginx -g "daemon off;"'
-    restart: always

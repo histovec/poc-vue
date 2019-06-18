@@ -12,11 +12,18 @@ Object.keys(baseWebpackConfig.entry).forEach(function (name) {
 })
 
 module.exports = merge(baseWebpackConfig, {
+  mode: 'development',
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap })
   },
   // cheap-module-eval-source-map is faster for development
   devtool: '#cheap-module-eval-source-map',
+  devServer: {
+    hot: true,
+    watchOptions: {
+      poll: true
+    }
+  },
   plugins: [
     new webpack.DefinePlugin({
       'process.env': config.dev.env
@@ -28,6 +35,7 @@ module.exports = merge(baseWebpackConfig, {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'index.html',
+      hash: true,
       inject: true
     }),
     new FriendlyErrorsPlugin()

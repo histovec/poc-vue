@@ -1,0 +1,17 @@
+{
+  "nature": {
+    "VTP": "Contrôle Technique Périodique",
+    "VTC": "Contrôle Technique Complémentaire",
+    "CV": "Contre-Visite",
+    "CVC": "Contre-Visite Complémentaire"
+  },
+  "resultat": {
+    "A": "favorable",
+    "AP": "complément favorable",
+    "S": "défavorable pour défaillances majeures",
+    "SP": "complément défavorable pour défaillances majeures",
+    "R": "défavorable pour défaillances critiques",
+    "RP": "complément défavorable pour défaillances critiques",
+    "X": "report"
+  }
+}

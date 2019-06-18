@@ -94,6 +94,25 @@ if [ "$test_result" -gt "0" ] ; then
 fi
 echo "$test_output"
 
+# test _cat/indices not red
+echo "# elasticsearch indices not red"
+set +e
+timeout=120;
+test_result=1
+until [ "$timeout" -le 0 -o "$test_result" -eq "0" ] ; do
+  if ! (docker exec -i ${USE_TTY} ${APP}-$container_name /bin/bash -c 'curl -s --fail -XGET "localhost:9200/_cat/indices"' | grep "^red" ) ; then
+      test_result=0
+  fi
+  echo "Wait $timeout seconds: /_cat/indices not 'red' $test_result";
+  (( timeout-- ))
+  sleep 1
+done
+if [ "$test_result" -gt "0" ] ; then
+  ret=$test_result
+  echo "ERROR: ${APP}-$container_name en erreur"
+  exit $ret
+fi
+
 # verification indice en read_only_allow_delete
 echo "# elasticsearch indice en read_only_allow_delete ?"
 list_indice="$dataset contact feedback"

@@ -7,7 +7,7 @@ networks:
 
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.3
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.7.0
     container_name: ${APP}-elasticsearch
     environment:
       - cluster.name=${APP}
@@ -18,4 +18,4 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - ${BACKEND}/esdata/:/usr/share/elasticsearch/data
+      - ${ES_DATA}:/usr/share/elasticsearch/data

@@ -2,10 +2,12 @@ log
 artifacts
 sample_data
 frontend/dist-build
-frontend/dist
+dist/
 infrastructure/heat-templates/CIT/param/*
 infrastructure/heat-templates/floating-ip/param/*
+.idea
 .lastcommit
 histovec-build
 *.tar.gz
 *.tar
+node_modules/

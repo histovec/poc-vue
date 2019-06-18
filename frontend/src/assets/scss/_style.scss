@@ -7,15 +7,15 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Raleway", sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
 }
 
 body {
-  font-family: "Roboto", sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
 }
 
 .logo-font {
-  font-family: "Pacifico", cursive, sans-serif;
+  font-family: "Pacifico", cursive, Arial, sans-serif;
 }
 /*Typography
 ---------------------------------- */
@@ -5167,7 +5167,7 @@ fieldset[disabled] .form-control {
   color: #ffffff;
   background: #09afdf;
   border-radius: 50%;
-  font-family: "Helvetica Neue", sans-serif;
+  font-family: "Helvetica Neue", Arial, sans-serif;
   font-size: 14px;
   font-weight: 100;
   line-height: 45px;
@@ -5348,7 +5348,7 @@ fieldset[disabled] .form-control {
   border-radius: 50%;
   background: #09afdf;
   color: #ffffff;
-  font-family: "Helvetica Neue", sans-serif;
+  font-family: "Helvetica Neue", Arial, sans-serif;
   font-weight: 100;
   text-align: center;
   -webkit-animation: pace-theme-center-circle-spin linear infinite 2s;
@@ -5453,7 +5453,7 @@ fieldset[disabled] .form-control {
   top: 0;
   right: 0.5rem;
   content: attr(data-progress-text);
-  font-family: "Helvetica Neue", sans-serif;
+  font-family: "Helvetica Neue", Arial, sans-serif;
   font-weight: 100;
   font-size: 100px;
   line-height: 1;
@@ -8169,7 +8169,7 @@ h6.media-heading {
 
 .xlarge_white {
   font-size: 68px;
-  font-family: "Raleway", sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
   font-weight: 400;
   color: #ffffff;
   line-height: 1.2;
@@ -8177,7 +8177,7 @@ h6.media-heading {
 
 .large_white {
   font-size: 42px;
-  font-family: "Raleway", sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
   color: #ffffff;
   line-height: 1.2;
 }
@@ -8196,7 +8196,7 @@ h6.media-heading {
 
 .xlarge_dark {
   font-size: 68px;
-  font-family: "Raleway", sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
   font-weight: 400;
   color: #333333;
   line-height: 1.2;
@@ -8204,13 +8204,13 @@ h6.media-heading {
 
 .large_dark {
   font-size: 42px;
-  font-family: "Raleway", sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
   color: #333333;
   line-height: 1.2;
 }
 
 .tp-caption.medium_dark {
-  font-family: "Roboto", sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 24px;
   color: #333333;
   font-weight: 400;
@@ -8488,7 +8488,7 @@ h6.media-heading {
   color: #ffffff;
   text-transform: none;
   font-weight: 300;
-  font-family: "Raleway", sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
 }
 /*Slider Revolution 5*/
 .hebe.tparrows {
@@ -8520,7 +8520,7 @@ h6.media-heading {
 .hebe .tp-arr-titleholder {
   text-transform: none;
   font-weight: 300;
-  font-family: "Raleway", sans-serif;
+  font-family: "Raleway", Arial, sans-serif;
   padding-left: 70px;
 }
 
@@ -10015,6 +10015,10 @@ td {
 
 .m-h-15 {
   margin: 15px 0 0;
+}
+
+.m-h-17 {
+  margin: 17px 0 0;
 }
 
 .m-h-20 {

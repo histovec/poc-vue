@@ -1,0 +1,66 @@
+version: '3.4'
+
+services:
+  backend:
+    image: ${APP}-backend-${EXEC_ENV}:${APP_VERSION}
+    build:
+      context: ${BACKEND}
+      target: ${EXEC_ENV}
+      dockerfile: Dockerfile
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
+        npm_registry: ${NPM_REGISTRY}
+        MIRROR_DEBIAN: ${MIRROR_DEBIAN}
+        app_path: /${APP}
+        app_name: ${APP}
+        app_ver: ${APP_VERSION}
+        port: ${BACKEND_PORT}
+    container_name: ${APP}-backend-${EXEC_ENV}
+    environment:
+      - NODE_ENV=${EXEC_ENV}
+      - BACKEND_PORT=${BACKEND_PORT}
+      - APP=${APP}
+      - APP_VERSION=${APP_VERSION}
+      - REDIS_URL=${REDIS_URL}
+      - REDIS_PERSIST=${REDIS_PERSIST}
+      - ES_URL=${ES_HOST}:${ES_PORT}
+      - ES_INDEX=${ES_INDEX}
+      - UTAC_URL=${UTAC_SCHEME}://${UTAC_HOST}:${UTAC_PORT}/${UTAC_API}
+      - UTAC_TIMEOUT=${UTAC_TIMEOUT}
+      - SMTP_SERVER=${SMTP_SERVER}
+      - SMTP_PORT=${SMTP_PORT}
+      - MAIL_FROM=${MAIL_FROM}
+      - MAIL_TO=${MAIL_TO}
+    volumes:
+      - ${BACKEND}/src:/${APP}/src/
+      - ${BACKEND}/dist:/${APP}/dist/
+      - /${APP}/node_modules
+    restart: on-failure
+    links:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${BACKEND_PORT}/${APP}/api/v1/health"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+
+  redis:
+    image: ${APP}-cache:${APP_VERSION}
+    build:
+      context: ${REDIS}
+      target: cache
+      dockerfile: Dockerfile
+    container_name: ${APP}-cache
+    volumes:
+      - ${REDIS_DATA}:/data
+    sysctls:
+      - net.core.somaxconn=65535
+
+networks:
+  default:
+    external:
+      name: ${APP}

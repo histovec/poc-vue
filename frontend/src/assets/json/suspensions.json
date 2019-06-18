@@ -1,0 +1,13 @@
+{
+  "PVE": "Procédure de réparation contrôlée",
+  "DES": "Destruction",
+  "REI": "Ré-immatriculation à l'étranger",
+  "TRA": "Retrait pour transformation",
+  "VOL": "Retrait volontaire de la circulation",
+  "PEN": "Immobilidation pour sanction pénale",
+  "PJU": "Immobilisation pour mesure de police judiciaire",
+  "SOR": "Suspension pour sortie de territoire",
+  "FNIM": "Destruction",
+  "FNIV": "Procédure de réparation contrôlée",
+  "ADM": "Suspension administrative"
+}
