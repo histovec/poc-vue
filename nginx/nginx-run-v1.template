@@ -12,6 +12,13 @@ server {
   real_ip_header X-Real-IP;
   real_ip_recursive on;
 
+  #don't send the nginx version number in error pages and Server header
+  server_tokens off;
+
+  # enabling HSTS(HTTP Strict Transport Security)
+  # https://developer.mozilla.org/en-US/docs/Web/Security/HTTP_strict_transport_security
+  add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
   location / {
     try_files $uri @rew;
   }
